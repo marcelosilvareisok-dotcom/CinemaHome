@@ -54,14 +54,20 @@ export default function Home() {
           
           <div className="flex gap-4 mb-6">
             <button 
-              onClick={() => featured && navigate(`/play/${featured.id}`)}
+              onClick={() => {
+                const mediaType = featured?.media_type || (featured?.name && !featured?.title ? 'tv' : 'movie');
+                featured && navigate(`/play/${mediaType}/${featured.id}`);
+              }}
               className="flex items-center gap-2 bg-white text-black px-6 py-2 md:px-8 md:py-3 rounded md:text-lg font-bold hover:bg-zinc-200 transition-colors"
             >
               <Play className="w-5 h-5 md:w-6 md:h-6 fill-current" />
               Assistir
             </button>
             <button 
-              onClick={() => featured && navigate(`/details/${featured.id}`)}
+              onClick={() => {
+                const mediaType = featured?.media_type || (featured?.name && !featured?.title ? 'tv' : 'movie');
+                featured && navigate(`/details/${mediaType}/${featured.id}`);
+              }}
               className="flex items-center gap-2 bg-zinc-500/70 text-white px-6 py-2 md:px-8 md:py-3 rounded md:text-lg font-bold hover:bg-zinc-500/90 transition-colors backdrop-blur-sm"
             >
               <Info className="w-5 h-5 md:w-6 md:h-6" />

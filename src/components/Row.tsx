@@ -62,14 +62,16 @@ export default function Row({ title, fetchData, isLargeRow = false }: RowProps) 
           className="flex gap-2 overflow-x-scroll scrollbar-hide scroll-smooth py-4"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {movies.map((movie) => (
+          {movies.map((movie) => {
+            const mediaType = movie.media_type || (movie.name && !movie.title ? 'tv' : 'movie');
+            return (
             ((isLargeRow && movie.poster_path) || (!isLargeRow && movie.backdrop_path)) && (
               <div 
                 key={movie.id} 
                 className={`relative flex-none transition-transform duration-300 hover:scale-105 hover:z-50 cursor-pointer ${
                   isLargeRow ? 'w-[150px] md:w-[200px]' : 'w-[200px] md:w-[280px]'
                 }`}
-                onClick={() => navigate(`/play/${movie.id}`)}
+                onClick={() => navigate(`/play/${mediaType}/${movie.id}`)}
               >
                 <img
                   src={`https://image.tmdb.org/t/p/original/${isLargeRow ? movie.poster_path : movie.backdrop_path}`}
@@ -83,7 +85,7 @@ export default function Row({ title, fetchData, isLargeRow = false }: RowProps) 
                   <h3 className="text-white font-bold text-sm mb-2 line-clamp-1">{movie.title || movie.name}</h3>
                   <div className="flex gap-2">
                     <button 
-                      onClick={(e) => { e.stopPropagation(); navigate(`/play/${movie.id}`); }}
+                      onClick={(e) => { e.stopPropagation(); navigate(`/play/${mediaType}/${movie.id}`); }}
                       className="bg-white text-black p-1.5 rounded-full hover:bg-zinc-200 transition-colors"
                     >
                       <Play className="w-4 h-4 fill-current" />
@@ -95,7 +97,7 @@ export default function Row({ title, fetchData, isLargeRow = false }: RowProps) 
                       <Plus className="w-4 h-4" />
                     </button>
                     <Link 
-                      to={`/details/${movie.id}`} 
+                      to={`/details/${mediaType}/${movie.id}`} 
                       onClick={(e) => e.stopPropagation()}
                       className="border border-zinc-400 text-white p-1.5 rounded-full hover:border-white transition-colors ml-auto"
                     >
@@ -105,7 +107,7 @@ export default function Row({ title, fetchData, isLargeRow = false }: RowProps) 
                 </div>
               </div>
             )
-          ))}
+          )})}
         </div>
 
         <button 

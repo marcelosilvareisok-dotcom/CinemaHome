@@ -4,16 +4,16 @@ import { Play, Plus, ArrowLeft, Star, Calendar } from 'lucide-react';
 import { getMovieDetails } from '../services/tmdb';
 
 export default function Details() {
-  const { id } = useParams<{ id: string }>();
+  const { type, id } = useParams<{ type: string, id: string }>();
   const navigate = useNavigate();
   const [movie, setMovie] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchDetails() {
-      if (!id) return;
+      if (!id || !type) return;
       try {
-        const response = await getMovieDetails(id);
+        const response = await getMovieDetails(id, type as 'movie' | 'tv');
         setMovie(response.data);
       } catch (err) {
         console.error("Erro ao buscar detalhes:", err);
@@ -108,7 +108,7 @@ export default function Details() {
 
             <div className="flex flex-wrap gap-4 mb-8">
               <button 
-                onClick={() => navigate(`/play/${movie.id}`)}
+                onClick={() => navigate(`/play/${type}/${movie.id}`)}
                 className="flex items-center gap-2 bg-white text-black px-8 py-3 rounded md:text-lg font-bold hover:bg-zinc-200 transition-colors"
               >
                 <Play className="w-6 h-6 fill-current" />
