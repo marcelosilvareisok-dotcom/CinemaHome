@@ -10,7 +10,7 @@ export default function Layout({ children }: LayoutProps) {
   const handleShare = async () => {
     const shareData = {
       title: 'CINEMAHOME',
-      text: 'Venha assistir aos melhores filmes e séries no CINEMAHOME!',
+      text: '🎬 Venha assistir aos melhores filmes e séries no CINEMAHOME! 🍿\n\nSe curtir, considere nos dar um apoio opcional para mantermos o projeto no ar! ❤️',
       url: 'https://cinema-home.vercel.app/',
     };
 
@@ -42,11 +42,11 @@ export default function Layout({ children }: LayoutProps) {
         <div className="flex items-center gap-4">
           <button 
             onClick={handleShare}
-            className="text-zinc-400 hover:text-white transition-colors flex items-center gap-1 text-sm mr-2"
+            className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-500 text-white px-4 py-1.5 rounded-full text-sm font-bold animate-pulse hover:animate-none hover:scale-105 transition-all shadow-[0_0_15px_rgba(220,38,38,0.6)] mr-2"
             title="Compartilhar App"
           >
             <Share2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Compartilhar</span>
+            <span className="hidden sm:inline">Compartilhar App</span>
           </button>
           <Link to="/admin" className="text-zinc-400 hover:text-white transition-colors flex items-center gap-1 text-sm">
             <ShieldCheck className="w-4 h-4" />
