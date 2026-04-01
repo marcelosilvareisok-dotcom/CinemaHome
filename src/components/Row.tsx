@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Play, Plus, Info } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface Movie {
   id: number;
@@ -21,6 +21,7 @@ interface RowProps {
 export default function Row({ title, fetchData, isLargeRow = false }: RowProps) {
   const [movies, setMovies] = useState<Movie[]>([]);
   const rowRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchMovies() {
@@ -68,6 +69,7 @@ export default function Row({ title, fetchData, isLargeRow = false }: RowProps) 
                 className={`relative flex-none transition-transform duration-300 hover:scale-105 hover:z-50 cursor-pointer ${
                   isLargeRow ? 'w-[150px] md:w-[200px]' : 'w-[200px] md:w-[280px]'
                 }`}
+                onClick={() => navigate(`/play/${movie.id}`)}
               >
                 <img
                   src={`https://image.tmdb.org/t/p/original/${isLargeRow ? movie.poster_path : movie.backdrop_path}`}
@@ -80,13 +82,23 @@ export default function Row({ title, fetchData, isLargeRow = false }: RowProps) 
                 <div className="absolute inset-0 bg-black/80 opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-md flex flex-col justify-end p-4">
                   <h3 className="text-white font-bold text-sm mb-2 line-clamp-1">{movie.title || movie.name}</h3>
                   <div className="flex gap-2">
-                    <button className="bg-white text-black p-1.5 rounded-full hover:bg-zinc-200 transition-colors">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); navigate(`/play/${movie.id}`); }}
+                      className="bg-white text-black p-1.5 rounded-full hover:bg-zinc-200 transition-colors"
+                    >
                       <Play className="w-4 h-4 fill-current" />
                     </button>
-                    <button className="border border-zinc-400 text-white p-1.5 rounded-full hover:border-white transition-colors">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); /* Add to list logic */ }}
+                      className="border border-zinc-400 text-white p-1.5 rounded-full hover:border-white transition-colors"
+                    >
                       <Plus className="w-4 h-4" />
                     </button>
-                    <Link to={`/details/${movie.id}`} className="border border-zinc-400 text-white p-1.5 rounded-full hover:border-white transition-colors ml-auto">
+                    <Link 
+                      to={`/details/${movie.id}`} 
+                      onClick={(e) => e.stopPropagation()}
+                      className="border border-zinc-400 text-white p-1.5 rounded-full hover:border-white transition-colors ml-auto"
+                    >
                       <Info className="w-4 h-4" />
                     </Link>
                   </div>

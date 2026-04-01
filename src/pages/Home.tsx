@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Play, Info } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { getNetflixOriginals, getTrending, getTopRated, getActionMovies, getComedyMovies, getHorrorMovies } from '../services/tmdb';
 import Row from '../components/Row';
 
@@ -13,6 +14,7 @@ interface Movie {
 
 export default function Home() {
   const [featured, setFeatured] = useState<Movie | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -51,11 +53,17 @@ export default function Home() {
           </h1>
           
           <div className="flex gap-4 mb-6">
-            <button className="flex items-center gap-2 bg-white text-black px-6 py-2 md:px-8 md:py-3 rounded md:text-lg font-bold hover:bg-zinc-200 transition-colors">
+            <button 
+              onClick={() => featured && navigate(`/play/${featured.id}`)}
+              className="flex items-center gap-2 bg-white text-black px-6 py-2 md:px-8 md:py-3 rounded md:text-lg font-bold hover:bg-zinc-200 transition-colors"
+            >
               <Play className="w-5 h-5 md:w-6 md:h-6 fill-current" />
               Assistir
             </button>
-            <button className="flex items-center gap-2 bg-zinc-500/70 text-white px-6 py-2 md:px-8 md:py-3 rounded md:text-lg font-bold hover:bg-zinc-500/90 transition-colors backdrop-blur-sm">
+            <button 
+              onClick={() => featured && navigate(`/details/${featured.id}`)}
+              className="flex items-center gap-2 bg-zinc-500/70 text-white px-6 py-2 md:px-8 md:py-3 rounded md:text-lg font-bold hover:bg-zinc-500/90 transition-colors backdrop-blur-sm"
+            >
               <Info className="w-5 h-5 md:w-6 md:h-6" />
               Mais Informações
             </button>
