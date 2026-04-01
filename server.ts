@@ -6,6 +6,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import { MercadoPagoConfig, PreApprovalPlan } from "mercadopago";
 
 dotenv.config();
 
@@ -37,6 +38,57 @@ async function startServer() {
   // API routes
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
+  });
+
+  // 💳 Integração Mercado Pago - Plano de Assinatura
+  app.post("/api/subscription/create", async (req, res) => {
+    try {
+      const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+      
+      if (!token) {
+        console.warn("[MERCADO PAGO] Token não configurado. Retornando link de simulação.");
+        return res.json({ 
+          init_point: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=mock",
+          mock: true
+        });
+      }
+
+      const client = new MercadoPagoConfig({ accessToken: token });
+      const plan = new PreApprovalPlan(client);
+      
+      const appUrl = process.env.APP_URL || `http://localhost:${PORT}`;
+
+      const response = await plan.create({
+        body: {
+          reason: "CINEMAHOME - Plano Mensal",
+          auto_recurring: {
+            frequency: 1,
+            frequency_type: "months",
+            billing_day: 10,
+            billing_day_proportional: false,
+            transaction_amount: 9.99,
+            currency_id: "BRL",
+            free_trial: {
+              frequency: 30,
+              frequency_type: "days"
+            }
+          },
+          back_url: `${appUrl}/plan/success`,
+        }
+      });
+      
+      res.json({ init_point: response.init_point });
+    } catch (error) {
+      console.error("[MERCADO PAGO] Erro ao criar plano:", error);
+      res.status(500).json({ error: "Falha ao gerar link de pagamento" });
+    }
+  });
+
+  // Webhook para receber confirmações do Mercado Pago
+  app.post("/api/subscription/webhook", (req, res) => {
+    console.log("[WEBHOOK MP] Evento recebido:", req.body);
+    // Aqui você atualizaria o status do usuário no Supabase para "premium"
+    res.status(200).send("OK");
   });
 
   // 🛠️ Endpoint de Saúde do Sistema (Dashboard Administrativo)

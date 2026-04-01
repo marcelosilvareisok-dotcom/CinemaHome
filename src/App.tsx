@@ -9,6 +9,8 @@ import Home from './pages/Home';
 import AdminDashboard from './pages/AdminDashboard';
 import Player from './pages/Player';
 import Details from './pages/Details';
+import Plan from './pages/Plan';
+import PlanSuccess from './pages/PlanSuccess';
 
 export default function App() {
   return (
@@ -19,6 +21,8 @@ export default function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/play/:id" element={<Player />} />
           <Route path="/details/:id" element={<Details />} />
+          <Route path="/plan" element={<Plan />} />
+          <Route path="/plan/success" element={<PlanSuccess />} />
         </Routes>
       </Layout>
     </Router>

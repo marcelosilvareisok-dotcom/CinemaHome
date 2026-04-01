@@ -26,7 +26,7 @@ export default function Layout({ children }: LayoutProps) {
             <span className="hidden sm:inline">Admin</span>
           </Link>
           <Link to="/login" className="hover:text-gray-300 text-sm font-medium">Entrar</Link>
-          <Link to="/signup" className="bg-red-600 px-4 py-1.5 rounded text-sm font-medium hover:bg-red-700 transition-colors">Assinar</Link>
+          <Link to="/plan" className="bg-red-600 px-4 py-1.5 rounded text-sm font-medium hover:bg-red-700 transition-colors">Assinar</Link>
         </div>
       </nav>
       <main>{children}</main>
