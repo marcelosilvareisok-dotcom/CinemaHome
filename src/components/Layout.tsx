@@ -1,12 +1,31 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Share2 } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const handleShare = async () => {
+    const shareData = {
+      title: 'CINEMAHOME',
+      text: 'Venha assistir aos melhores filmes e séries no CINEMAHOME!',
+      url: 'https://cinema-home.vercel.app/',
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        alert('Link copiado para a área de transferência!');
+      }
+    } catch (err) {
+      console.error('Erro ao compartilhar:', err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       <nav className="flex items-center justify-between p-4 bg-black/80 sticky top-0 z-50 backdrop-blur-sm border-b border-zinc-900">
@@ -21,6 +40,14 @@ export default function Layout({ children }: LayoutProps) {
           </div>
         </div>
         <div className="flex items-center gap-4">
+          <button 
+            onClick={handleShare}
+            className="text-zinc-400 hover:text-white transition-colors flex items-center gap-1 text-sm mr-2"
+            title="Compartilhar App"
+          >
+            <Share2 className="w-4 h-4" />
+            <span className="hidden sm:inline">Compartilhar</span>
+          </button>
           <Link to="/admin" className="text-zinc-400 hover:text-white transition-colors flex items-center gap-1 text-sm">
             <ShieldCheck className="w-4 h-4" />
             <span className="hidden sm:inline">Admin</span>
