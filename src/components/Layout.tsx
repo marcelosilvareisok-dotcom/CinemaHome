@@ -56,10 +56,10 @@ export default function Layout({ children }: LayoutProps) {
           <Link to="/" className="text-red-600 font-bold text-3xl tracking-tighter">CINEMAHOME</Link>
           <div className="hidden md:flex gap-4 text-sm font-medium text-zinc-300">
             <Link to="/" className="hover:text-white transition-colors">Início</Link>
-            <Link to="/" className="hover:text-white transition-colors">Séries</Link>
-            <Link to="/" className="hover:text-white transition-colors">Filmes</Link>
-            <Link to="/" className="hover:text-white transition-colors">Bombando</Link>
-            <Link to="/" className="hover:text-white transition-colors">Minha Lista</Link>
+            <Link to="/series" className="hover:text-white transition-colors">Séries</Link>
+            <Link to="/movies" className="hover:text-white transition-colors">Filmes</Link>
+            <Link to="/trending" className="hover:text-white transition-colors">Bombando</Link>
+            <Link to="/my-list" className="hover:text-white transition-colors">Minha Lista</Link>
           </div>
         </div>
         <div className="flex items-center gap-4">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Play, Plus, ArrowLeft, Star, Calendar } from 'lucide-react';
+import { Play, Plus, Check, ArrowLeft, Star, Calendar } from 'lucide-react';
 import { getMovieDetails } from '../services/tmdb';
 
 export default function Details() {
@@ -8,6 +8,7 @@ export default function Details() {
   const navigate = useNavigate();
   const [movie, setMovie] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [inList, setInList] = useState(false);
 
   useEffect(() => {
     async function fetchDetails() {
@@ -15,6 +16,13 @@ export default function Details() {
       try {
         const response = await getMovieDetails(id, type as 'movie' | 'tv');
         setMovie(response.data);
+        
+        // Check if in list
+        const savedList = localStorage.getItem('cinemahome_mylist');
+        if (savedList) {
+          const list = JSON.parse(savedList);
+          setInList(list.some((item: any) => item.id === response.data.id));
+        }
       } catch (err) {
         console.error("Erro ao buscar detalhes:", err);
       } finally {
@@ -22,7 +30,25 @@ export default function Details() {
       }
     }
     fetchDetails();
-  }, [id]);
+  }, [id, type]);
+
+  const toggleList = () => {
+    if (!movie) return;
+    
+    const savedList = localStorage.getItem('cinemahome_mylist');
+    let list = savedList ? JSON.parse(savedList) : [];
+    
+    if (inList) {
+      list = list.filter((item: any) => item.id !== movie.id);
+    } else {
+      // Add media_type to the movie object so MyList knows where to route
+      const movieToAdd = { ...movie, media_type: type };
+      list.push(movieToAdd);
+    }
+    
+    localStorage.setItem('cinemahome_mylist', JSON.stringify(list));
+    setInList(!inList);
+  };
 
   if (loading) {
     return (
@@ -114,9 +140,12 @@ export default function Details() {
                 <Play className="w-6 h-6 fill-current" />
                 Assistir
               </button>
-              <button className="flex items-center gap-2 border border-zinc-500 text-white px-6 py-3 rounded md:text-lg font-bold hover:bg-zinc-800 transition-colors">
-                <Plus className="w-6 h-6" />
-                Minha Lista
+              <button 
+                onClick={toggleList}
+                className="flex items-center gap-2 border border-zinc-500 text-white px-6 py-3 rounded md:text-lg font-bold hover:bg-zinc-800 transition-colors"
+              >
+                {inList ? <Check className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
+                {inList ? 'Na Minha Lista' : 'Minha Lista'}
               </button>
             </div>
 

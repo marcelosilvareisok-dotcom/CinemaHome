@@ -7,11 +7,11 @@ export default function Player() {
   const navigate = useNavigate();
   const [activeServer, setActiveServer] = useState<number>(0);
 
-  // Múltiplos servidores caso um deles não tenha o filme/série
+  // Múltiplos servidores focados em conteúdo Dublado/Legendado em PT-BR
   const servers = [
-    { name: 'Servidor 1 (Principal)', url: `https://vidsrc.net/embed/${type}?tmdb=${id}` },
-    { name: 'Servidor 2 (Alternativo)', url: `https://vidsrc.pro/embed/${type}/${id}` },
-    { name: 'Servidor 3 (Multi)', url: `https://multiembed.mov/?video_id=${id}&tmdb=1` }
+    { name: 'Servidor 1 (Dublado/Legendado)', url: `https://superflixapi.top/${type === 'movie' ? 'filme' : 'serie'}/${id}` },
+    { name: 'Servidor 2 (Alternativo PT-BR)', url: `https://embed.warezcdn.net/${type === 'movie' ? 'filme' : 'serie'}/${id}` },
+    { name: 'Servidor 3 (Global com Legendas)', url: `https://vidsrc.net/embed/${type}?tmdb=${id}` }
   ];
 
   return (
