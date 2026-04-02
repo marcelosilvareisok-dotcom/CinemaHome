@@ -11,6 +11,7 @@ import Player from './pages/Player';
 import Details from './pages/Details';
 import Plan from './pages/Plan';
 import PlanSuccess from './pages/PlanSuccess';
+import Search from './pages/Search';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/search" element={<Search />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/play/:type/:id" element={<Player />} />
           <Route path="/details/:type/:id" element={<Details />} />

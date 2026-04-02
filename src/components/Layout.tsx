@@ -1,6 +1,6 @@
-import { useState, ReactNode } from 'react';
-import { Link } from 'react-router-dom';
-import { ShieldCheck, Share2, X, Copy, Heart, MessageCircle } from 'lucide-react';
+import { useState, ReactNode, FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ShieldCheck, Share2, X, Copy, Heart, MessageCircle, Search } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -8,6 +8,18 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSearch = (e: FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setIsSearchOpen(false);
+      setSearchQuery('');
+    }
+  };
   const handleShare = async () => {
     const shareData = {
       title: 'CINEMAHOME',
@@ -50,6 +62,30 @@ export default function Layout({ children }: LayoutProps) {
           </div>
         </div>
         <div className="flex items-center gap-4">
+          {/* Search Bar */}
+          <div className="relative flex items-center">
+            <form 
+              onSubmit={handleSearch}
+              className={`flex items-center transition-all duration-300 ${isSearchOpen ? 'w-48 sm:w-64 opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}
+            >
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Títulos, gente e gêneros"
+                className="w-full bg-black/50 border border-white/80 text-white text-sm px-3 py-1.5 focus:outline-none focus:border-white transition-colors"
+                autoFocus={isSearchOpen}
+              />
+            </form>
+            <button 
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="text-white p-2 hover:text-zinc-300 transition-colors"
+              title="Pesquisar"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+          </div>
+
           <button 
             onClick={() => setIsShareModalOpen(true)}
             className="flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-red-600 to-orange-500 text-white px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold animate-pulse hover:animate-none hover:scale-105 transition-all shadow-[0_0_15px_rgba(220,38,38,0.6)] mr-1 sm:mr-2"
