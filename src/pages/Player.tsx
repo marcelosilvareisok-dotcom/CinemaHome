@@ -8,6 +8,7 @@ export default function Player() {
   const [activeServer, setActiveServer] = useState<number>(0);
   const [showServers, setShowServers] = useState(false);
   const [status, setStatus] = useState<'searching' | 'playing'>('searching');
+  const [countdown, setCountdown] = useState(3);
 
   // Múltiplos servidores focados em conteúdo Dublado/Legendado em PT-BR
   const servers = [
@@ -29,12 +30,15 @@ export default function Player() {
   ];
 
   useEffect(() => {
-    // Simula o tempo de carregamento e vai direto para o filme
-    const timer = setTimeout(() => {
-      setStatus('playing');
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, []);
+    if (status === 'searching') {
+      if (countdown > 0) {
+        const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+        return () => clearTimeout(timer);
+      } else {
+        setStatus('playing');
+      }
+    }
+  }, [countdown, status]);
 
   return (
     <div className="min-h-screen bg-black text-white relative flex flex-col">
@@ -90,15 +94,27 @@ export default function Player() {
 
       <div className="w-full flex-1 h-screen flex items-center justify-center">
         {status === 'searching' && (
-          <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500">
-            <div className="relative">
-              <Clapperboard className="w-16 h-16 text-red-600 animate-bounce" />
+          <div className="flex flex-col items-center gap-8 animate-in fade-in duration-500">
+            <div className="relative flex items-center justify-center w-32 h-32">
+              {/* Círculo pulsante de fundo */}
+              <div className="absolute inset-0 bg-red-600/20 rounded-full animate-ping"></div>
+              {/* Círculo principal com o número */}
+              <div className="absolute inset-0 bg-zinc-900/80 rounded-full border-4 border-red-600 flex items-center justify-center shadow-[0_0_30px_rgba(220,38,38,0.4)]">
+                <span 
+                  key={countdown} 
+                  className="text-6xl font-black text-white animate-in zoom-in duration-300"
+                >
+                  {countdown}
+                </span>
+              </div>
             </div>
-            <div className="flex flex-col items-center gap-2">
-              <h2 className="text-xl font-bold text-zinc-200">Preparando a pipoca... 🍿</h2>
-              <div className="flex items-center gap-2 text-zinc-500 text-sm">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Ajeitando o projetor</span>
+            
+            <div className="flex flex-col items-center gap-4 text-center">
+              <h2 className="text-2xl font-bold text-zinc-200">Preparando a sessão... 🍿</h2>
+              
+              <div className="flex items-center gap-2 text-green-400 text-sm font-medium bg-green-400/10 px-4 py-2 rounded-full border border-green-400/20">
+                <Check className="w-4 h-4" />
+                <span>Carregando versão em Português (Brasil)</span>
               </div>
             </div>
           </div>
