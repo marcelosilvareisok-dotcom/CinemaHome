@@ -3,6 +3,7 @@ import { Play, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getNetflixOriginals, getTrending, getTopRated, getActionMovies, getComedyMovies, getHorrorMovies } from '../services/tmdb';
 import Row from '../components/Row';
+import AdBanner from '../components/AdBanner';
 
 interface Movie {
   id: number;
@@ -85,8 +86,18 @@ export default function Home() {
       <div className="-mt-24 relative z-10 pb-16 space-y-8">
         <Row title="Originais CINEMAHOME" fetchData={getNetflixOriginals} isLargeRow />
         <Row title="Em Alta" fetchData={getTrending} />
+        
+        <div className="px-4 md:px-12 py-4">
+          <AdBanner />
+        </div>
+
         <Row title="Aclamados pela Crítica" fetchData={getTopRated} />
         <Row title="Ação e Aventura" fetchData={getActionMovies} />
+        
+        <div className="px-4 md:px-12 py-4">
+          <AdBanner />
+        </div>
+
         <Row title="Comédias" fetchData={getComedyMovies} />
         <Row title="Terror" fetchData={getHorrorMovies} />
       </div>

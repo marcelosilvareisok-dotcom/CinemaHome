@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Play, Plus, Check, ArrowLeft, Star, Calendar } from 'lucide-react';
 import { getMovieDetails } from '../services/tmdb';
+import AdBanner from '../components/AdBanner';
 
 export default function Details() {
   const { type, id } = useParams<{ type: string, id: string }>();
@@ -170,6 +171,10 @@ export default function Details() {
               )}
             </div>
           </div>
+        </div>
+        
+        <div className="mt-16">
+          <AdBanner />
         </div>
       </div>
     </div>
