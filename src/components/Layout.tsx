@@ -1,6 +1,6 @@
 import { useState, ReactNode, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Share2, X, Copy, Heart, MessageCircle, Search } from 'lucide-react';
+import { ShieldCheck, Share2, X, Copy, Heart, MessageCircle, Search, PartyPopper } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -50,7 +50,14 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white flex flex-col">
+      {/* Banner Pioneiros */}
+      <div className="bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600 text-black text-center py-2 px-4 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md z-[60] relative">
+        <PartyPopper className="w-4 h-4 animate-bounce" />
+        <span>Parabéns! Você é um dos 100 primeiros (os pioneiros!). Acesso VIP liberado sem cadastro! Pegue a pipoca e aproveite! 🍿</span>
+        <PartyPopper className="w-4 h-4 animate-bounce" />
+      </div>
+
       <nav className="flex items-center justify-between p-4 bg-black/80 sticky top-0 z-50 backdrop-blur-sm border-b border-zinc-900">
         <div className="flex items-center gap-8">
           <Link to="/" className="text-red-600 font-bold text-3xl tracking-tighter">CINEMAHOME</Link>
@@ -99,11 +106,11 @@ export default function Layout({ children }: LayoutProps) {
             <ShieldCheck className="w-4 h-4" />
             <span className="hidden sm:inline">Admin</span>
           </Link>
-          <Link to="/login" className="hover:text-gray-300 text-sm font-medium">Entrar</Link>
-          <Link to="/plan" className="bg-red-600 px-4 py-1.5 rounded text-sm font-medium hover:bg-red-700 transition-colors">Assinar</Link>
+          <Link to="/login" className="hover:text-gray-300 text-sm font-medium hidden sm:block">Entrar</Link>
+          <Link to="/plan" className="bg-red-600 px-4 py-1.5 rounded text-sm font-medium hover:bg-red-700 transition-colors hidden sm:block">Assinar</Link>
         </div>
       </nav>
-      <main>{children}</main>
+      <main className="flex-1">{children}</main>
 
       {/* Modal de Compartilhamento / PIX */}
       {isShareModalOpen && (

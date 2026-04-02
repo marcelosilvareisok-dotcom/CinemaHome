@@ -36,7 +36,7 @@ const mockMovie = {
 
 const mockResponse = {
   data: {
-    results: Array(10).fill(mockMovie).map((m, i) => ({ ...m, id: i + 1 }))
+    results: Array(100).fill(mockMovie).map((m, i) => ({ ...m, id: i + 1 }))
   }
 };
 
@@ -60,21 +60,39 @@ const withFallback = async (requestFn: () => Promise<any>, isDetails = false) =>
   }
 };
 
-export const getTrending = () => withFallback(() => tmdbApi.get('/trending/all/week'));
-export const getNetflixOriginals = () => withFallback(() => tmdbApi.get('/discover/tv?with_networks=213'));
-export const getTopRated = () => withFallback(() => tmdbApi.get('/movie/top_rated'));
-export const getActionMovies = () => withFallback(() => tmdbApi.get('/discover/movie?with_genres=28'));
-export const getComedyMovies = () => withFallback(() => tmdbApi.get('/discover/movie?with_genres=35'));
-export const getHorrorMovies = () => withFallback(() => tmdbApi.get('/discover/movie?with_genres=27'));
-export const getRomanceMovies = () => withFallback(() => tmdbApi.get('/discover/movie?with_genres=10749'));
-export const getDocumentaries = () => withFallback(() => tmdbApi.get('/discover/movie?with_genres=99'));
-export const getPopularMovies = () => withFallback(() => tmdbApi.get('/movie/popular'));
-export const getPopularSeries = () => withFallback(() => tmdbApi.get('/tv/popular'));
+// Helper para buscar 100 resultados (5 páginas de 20)
+const fetch100 = async (endpoint: string) => {
+  return withFallback(async () => {
+    const promises = [];
+    for (let i = 1; i <= 5; i++) {
+      const separator = endpoint.includes('?') ? '&' : '?';
+      promises.push(tmdbApi.get(`${endpoint}${separator}page=${i}`));
+    }
+    const responses = await Promise.all(promises);
+    const allResults = responses.flatMap(res => res.data.results);
+    
+    // Remove duplicatas baseadas no ID para evitar erros de chaves no React
+    const uniqueResults = Array.from(new Map(allResults.map(item => [item.id, item])).values());
+    
+    return { data: { results: uniqueResults } };
+  });
+};
 
-export const getActionSeries = () => withFallback(() => tmdbApi.get('/discover/tv?with_genres=10759'));
-export const getComedySeries = () => withFallback(() => tmdbApi.get('/discover/tv?with_genres=35'));
-export const getDramaSeries = () => withFallback(() => tmdbApi.get('/discover/tv?with_genres=18'));
-export const getSciFiSeries = () => withFallback(() => tmdbApi.get('/discover/tv?with_genres=10765'));
+export const getTrending = () => fetch100('/trending/all/week');
+export const getNetflixOriginals = () => fetch100('/discover/tv?with_networks=213');
+export const getTopRated = () => fetch100('/movie/top_rated');
+export const getActionMovies = () => fetch100('/discover/movie?with_genres=28');
+export const getComedyMovies = () => fetch100('/discover/movie?with_genres=35');
+export const getHorrorMovies = () => fetch100('/discover/movie?with_genres=27');
+export const getRomanceMovies = () => fetch100('/discover/movie?with_genres=10749');
+export const getDocumentaries = () => fetch100('/discover/movie?with_genres=99');
+export const getPopularMovies = () => fetch100('/movie/popular');
+export const getPopularSeries = () => fetch100('/tv/popular');
+
+export const getActionSeries = () => fetch100('/discover/tv?with_genres=10759');
+export const getComedySeries = () => fetch100('/discover/tv?with_genres=35');
+export const getDramaSeries = () => fetch100('/discover/tv?with_genres=18');
+export const getSciFiSeries = () => fetch100('/discover/tv?with_genres=10765');
 
 export const getMovieDetails = (id: string, type: 'movie' | 'tv' = 'movie') => 
   withFallback(() => tmdbApi.get(`/${type}/${id}?append_to_response=videos,credits`), true);
