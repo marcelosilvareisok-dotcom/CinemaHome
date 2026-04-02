@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, Server, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Check, AlertTriangle, Volume2, Settings2, Loader2 } from 'lucide-react';
+import { getMovieDetails } from '../services/tmdb';
 
 export default function Player() {
   const { type, id } = useParams<{ type: string, id: string }>();
@@ -8,6 +9,7 @@ export default function Player() {
   const [status, setStatus] = useState<'searching' | 'playing'>('searching');
   const [countdown, setCountdown] = useState(3);
   const [activeServer, setActiveServer] = useState(0);
+  const [showControlsToast, setShowControlsToast] = useState(false);
 
   // APIs gratuitas variam muito. É essencial ter opções.
   const servers = [
@@ -32,15 +34,47 @@ export default function Player() {
         return () => clearTimeout(timer);
       } else {
         setStatus('playing');
+        saveToHistory();
       }
     }
   }, [countdown, status]);
+
+  const saveToHistory = async () => {
+    try {
+      const response = await getMovieDetails(id!, type as 'movie' | 'tv');
+      const details = response.data;
+      
+      const historyItem = {
+        id: details.id,
+        type: type,
+        title: details.title || details.name,
+        poster_path: details.poster_path,
+        backdrop_path: details.backdrop_path,
+        timestamp: Date.now()
+      };
+
+      const currentHistory = JSON.parse(localStorage.getItem('cinemahome_history') || '[]');
+      const filteredHistory = currentHistory.filter((item: any) => item.id !== historyItem.id);
+      
+      filteredHistory.unshift(historyItem);
+      const newHistory = filteredHistory.slice(0, 5); // Keep only last 5
+      
+      localStorage.setItem('cinemahome_history', JSON.stringify(newHistory));
+    } catch (error) {
+      console.error("Failed to save history", error);
+    }
+  };
 
   const handleNextServer = () => {
     const nextServer = (activeServer + 1) % servers.length;
     setActiveServer(nextServer);
     setStatus('searching');
     setCountdown(3); // Reinicia a contagem para o novo servidor
+  };
+
+  const handleFakeControlClick = () => {
+    setShowControlsToast(true);
+    setTimeout(() => setShowControlsToast(false), 4000);
   };
 
   return (
@@ -55,16 +89,41 @@ export default function Player() {
           <span className="font-medium">Voltar</span>
         </button>
 
-        <div className="relative pointer-events-auto">
+        <div className="relative pointer-events-auto flex flex-col items-end gap-2">
           {status === 'playing' && (
-            <button 
-              onClick={handleNextServer}
-              className="flex items-center gap-2 bg-red-600/80 hover:bg-red-600 px-4 py-2 rounded-full backdrop-blur-sm transition-all border border-red-500/50 shadow-lg"
-              title="Se o vídeo não carregar ou estiver no idioma errado, clique aqui"
-            >
-              <AlertTriangle className="w-4 h-4 text-white" />
-              <span className="text-sm font-medium text-white hidden sm:inline">Filme não rodou? Tentar próximo servidor</span>
-            </button>
+            <>
+              <div className="flex gap-2">
+                <button 
+                  onClick={handleFakeControlClick}
+                  className="flex items-center gap-2 bg-black/50 hover:bg-black/80 px-3 py-2 rounded-full backdrop-blur-sm transition-all border border-zinc-800"
+                  title="Volume"
+                >
+                  <Volume2 className="w-4 h-4 text-zinc-300" />
+                </button>
+                <button 
+                  onClick={handleFakeControlClick}
+                  className="flex items-center gap-2 bg-black/50 hover:bg-black/80 px-3 py-2 rounded-full backdrop-blur-sm transition-all border border-zinc-800"
+                  title="Velocidade de Reprodução"
+                >
+                  <Settings2 className="w-4 h-4 text-zinc-300" />
+                  <span className="text-xs font-medium text-zinc-300">1x</span>
+                </button>
+                <button 
+                  onClick={handleNextServer}
+                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-full backdrop-blur-sm transition-all border border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.5)] animate-pulse hover:animate-none"
+                  title="Se o vídeo não carregar ou estiver no idioma errado, clique aqui"
+                >
+                  <AlertTriangle className="w-4 h-4 text-white" />
+                  <span className="text-sm font-bold text-white hidden sm:inline">Deu erro? Tentar próximo servidor</span>
+                </button>
+              </div>
+
+              {showControlsToast && (
+                <div className="bg-zinc-900/90 border border-zinc-700 text-sm text-zinc-300 px-4 py-2 rounded-lg animate-in fade-in slide-in-from-top-2">
+                  Use os controles nativos dentro do player de vídeo abaixo para ajustar volume, tela cheia e velocidade.
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -86,11 +145,11 @@ export default function Player() {
             </div>
             
             <div className="flex flex-col items-center gap-4 text-center">
-              <h2 className="text-2xl font-bold text-zinc-200">Preparando a sessão... 🍿</h2>
+              <h2 className="text-2xl font-bold text-zinc-200">Procurando servidor funcional... 🍿</h2>
               
               <div className="flex items-center gap-2 text-green-400 text-sm font-medium bg-green-400/10 px-4 py-2 rounded-full border border-green-400/20">
-                <Check className="w-4 h-4" />
-                <span>Buscando automaticamente: {servers[activeServer].name}</span>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Testando: {servers[activeServer].name}</span>
               </div>
             </div>
           </div>
