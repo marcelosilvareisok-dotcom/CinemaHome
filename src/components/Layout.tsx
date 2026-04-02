@@ -21,18 +21,19 @@ export default function Layout({ children }: LayoutProps) {
     }
   };
   const handleShare = async () => {
+    const shareText = '🎬 Venha assistir aos melhores filmes e séries no CINEMAHOME! 🍿\nhttps://cinema-home.vercel.app/\n\nSe curtir, considere nos dar um apoio opcional para mantermos o projeto no ar! ❤️';
+    
     const shareData = {
       title: 'CINEMAHOME',
-      text: '🎬 Venha assistir aos melhores filmes e séries no CINEMAHOME! 🍿\n\nSe curtir, considere nos dar um apoio opcional para mantermos o projeto no ar! ❤️',
-      url: 'https://cinema-home.vercel.app/',
+      text: shareText,
     };
 
     try {
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
-        await navigator.clipboard.writeText(shareData.url);
-        alert('Link copiado para a área de transferência!');
+        await navigator.clipboard.writeText(shareText);
+        alert('Mensagem copiada para a área de transferência!');
       }
     } catch (err) {
       console.error('Erro ao compartilhar:', err);
