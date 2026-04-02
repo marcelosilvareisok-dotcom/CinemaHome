@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings, Check, Play, Server, AlertCircle, Loader2, Clapperboard } from 'lucide-react';
+import { ArrowLeft, Settings, Check, Loader2, Clapperboard } from 'lucide-react';
 
 export default function Player() {
   const { type, id } = useParams<{ type: string, id: string }>();
   const navigate = useNavigate();
   const [activeServer, setActiveServer] = useState<number>(0);
   const [showServers, setShowServers] = useState(false);
-  const [status, setStatus] = useState<'searching' | 'info' | 'playing'>('searching');
+  const [status, setStatus] = useState<'searching' | 'playing'>('searching');
 
   // Múltiplos servidores focados em conteúdo Dublado/Legendado em PT-BR
   const servers = [
@@ -29,9 +29,9 @@ export default function Player() {
   ];
 
   useEffect(() => {
-    // Simula a busca pelo melhor servidor e verificação de status
+    // Simula o tempo de carregamento e vai direto para o filme
     const timer = setTimeout(() => {
-      setStatus('info');
+      setStatus('playing');
     }, 2500);
     return () => clearTimeout(timer);
   }, []);
@@ -101,44 +101,6 @@ export default function Player() {
                 <span>Ajeitando o projetor</span>
               </div>
             </div>
-          </div>
-        )}
-
-        {status === 'info' && (
-          <div className="bg-zinc-900/80 border border-zinc-800 p-8 rounded-2xl max-w-md w-full mx-4 animate-in zoom-in-95 duration-300 flex flex-col items-center text-center">
-            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-6">
-              <Check className="w-8 h-8 text-green-500" />
-            </div>
-            <h2 className="text-2xl font-bold mb-2">Servidor Encontrado!</h2>
-            
-            <div className="w-full bg-black/50 rounded-lg p-4 mb-6 text-left space-y-4 border border-zinc-800">
-              <div className="flex items-center gap-3">
-                <Server className="w-5 h-5 text-blue-400" />
-                <div>
-                  <p className="text-xs text-zinc-500 uppercase font-bold">Servidor Atual (100% Estável)</p>
-                  <p className="text-sm font-medium">{servers[activeServer].name}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <AlertCircle className="w-5 h-5 text-yellow-400" />
-                <div>
-                  <p className="text-xs text-zinc-500 uppercase font-bold">Idioma / Áudio</p>
-                  <p className="text-sm font-medium">{servers[activeServer].lang}</p>
-                </div>
-              </div>
-            </div>
-
-            <p className="text-xs text-zinc-500 mb-6">
-              Nota: O servidor tentará carregar a versão dublada primeiro. Caso a dublagem ainda não exista, carregará a legendada automaticamente.
-            </p>
-
-            <button 
-              onClick={() => setStatus('playing')}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-transform hover:scale-105"
-            >
-              <Play className="w-5 h-5 fill-current" />
-              Iniciar Filme
-            </button>
           </div>
         )}
 
