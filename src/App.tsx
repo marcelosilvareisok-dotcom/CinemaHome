@@ -14,7 +14,9 @@ import PlanSuccess from './pages/PlanSuccess';
 import Search from './pages/Search';
 import Category from './pages/Category';
 import MyList from './pages/MyList';
-import { getPopularMovies, getPopularSeries, getTrending } from './services/tmdb';
+import Movies from './pages/Movies';
+import Series from './pages/Series';
+import { getTrending } from './services/tmdb';
 
 export default function App() {
   return (
@@ -23,8 +25,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/series" element={<Category title="Séries" fetchData={getPopularSeries} mediaType="tv" />} />
-          <Route path="/movies" element={<Category title="Filmes" fetchData={getPopularMovies} mediaType="movie" />} />
+          <Route path="/series" element={<Series />} />
+          <Route path="/movies" element={<Movies />} />
           <Route path="/trending" element={<Category title="Bombando" fetchData={getTrending} />} />
           <Route path="/my-list" element={<MyList />} />
           <Route path="/admin" element={<AdminDashboard />} />

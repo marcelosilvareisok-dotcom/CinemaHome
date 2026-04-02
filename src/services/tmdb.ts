@@ -71,6 +71,11 @@ export const getDocumentaries = () => withFallback(() => tmdbApi.get('/discover/
 export const getPopularMovies = () => withFallback(() => tmdbApi.get('/movie/popular'));
 export const getPopularSeries = () => withFallback(() => tmdbApi.get('/tv/popular'));
 
+export const getActionSeries = () => withFallback(() => tmdbApi.get('/discover/tv?with_genres=10759'));
+export const getComedySeries = () => withFallback(() => tmdbApi.get('/discover/tv?with_genres=35'));
+export const getDramaSeries = () => withFallback(() => tmdbApi.get('/discover/tv?with_genres=18'));
+export const getSciFiSeries = () => withFallback(() => tmdbApi.get('/discover/tv?with_genres=10765'));
+
 export const getMovieDetails = (id: string, type: 'movie' | 'tv' = 'movie') => 
   withFallback(() => tmdbApi.get(`/${type}/${id}?append_to_response=videos,credits`), true);
 
