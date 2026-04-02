@@ -14,16 +14,24 @@ export default function Player() {
   // APIs gratuitas variam muito. É essencial ter opções.
   const servers = [
     {
-      name: 'Servidor 1 (Dublado PT-BR)',
-      url: `https://superflixapi.top/${type === 'movie' ? 'filme' : 'serie'}/${id}`
-    },
-    {
-      name: 'Servidor 2 (Dublado/Legendado)',
+      name: 'Servidor 1 (Dublado PT-BR - WarezCDN)',
       url: `https://embed.warezcdn.net/${type === 'movie' ? 'filme' : 'serie'}/${id}`
     },
     {
-      name: 'Servidor 3 (Inglês/Legendado)',
-      url: `https://vidsrc.net/embed/${type}?tmdb=${id}`
+      name: 'Servidor 2 (Dublado PT-BR - SuperFlix)',
+      url: `https://superflixapi.top/${type === 'movie' ? 'filme' : 'serie'}/${id}`
+    },
+    {
+      name: 'Servidor 3 (Múltiplos - AutoEmbed)',
+      url: `https://player.autoembed.cc/embed/${type}/${id}`
+    },
+    {
+      name: 'Servidor 4 (Múltiplos - SmashyStream)',
+      url: `https://player.smashy.stream/${type}?tmdb=${id}`
+    },
+    {
+      name: 'Servidor 5 (Legendado - VidSrc)',
+      url: `https://vidsrc.to/embed/${type}/${id}`
     }
   ];
 
