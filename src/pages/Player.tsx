@@ -11,27 +11,11 @@ export default function Player() {
   const [activeServer, setActiveServer] = useState(0);
   const [showControlsToast, setShowControlsToast] = useState(false);
 
-  // APIs gratuitas variam muito. É essencial ter opções.
+  // Apenas 1 servidor que reproduza os filmes TMDB
   const servers = [
     {
-      name: 'Servidor 1 (Dublado PT-BR - WarezCDN)',
-      url: `https://embed.warezcdn.net/${type === 'movie' ? 'filme' : 'serie'}/${id}`
-    },
-    {
-      name: 'Servidor 2 (Dublado PT-BR - SuperFlix)',
-      url: `https://superflixapi.top/${type === 'movie' ? 'filme' : 'serie'}/${id}`
-    },
-    {
-      name: 'Servidor 3 (Múltiplos - AutoEmbed)',
+      name: 'Servidor Principal (AutoEmbed)',
       url: `https://player.autoembed.cc/embed/${type}/${id}`
-    },
-    {
-      name: 'Servidor 4 (Múltiplos - SmashyStream)',
-      url: `https://player.smashy.stream/${type}?tmdb=${id}`
-    },
-    {
-      name: 'Servidor 5 (Legendado - VidSrc)',
-      url: `https://vidsrc.to/embed/${type}/${id}`
     }
   ];
 
@@ -115,14 +99,6 @@ export default function Player() {
                 >
                   <Settings2 className="w-4 h-4 text-zinc-300" />
                   <span className="text-xs font-medium text-zinc-300">1x</span>
-                </button>
-                <button 
-                  onClick={handleNextServer}
-                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-full backdrop-blur-sm transition-all border border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.5)] animate-pulse hover:animate-none"
-                  title="Se o vídeo não carregar ou estiver no idioma errado, clique aqui"
-                >
-                  <AlertTriangle className="w-4 h-4 text-white" />
-                  <span className="text-sm font-bold text-white hidden sm:inline">Deu erro? Tentar próximo servidor</span>
                 </button>
               </div>
 
