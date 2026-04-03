@@ -14,8 +14,8 @@ export default function Player() {
   // Apenas 1 servidor que reproduza os filmes TMDB
   const servers = [
     {
-      name: 'Servidor Principal (AutoEmbed)',
-      url: `https://player.autoembed.cc/embed/${type}/${id}`
+      name: 'Servidor Principal (Dublado/Legendado)',
+      url: `https://embed.warezcdn.net/${type === 'movie' ? 'filme' : 'serie'}/${id}`
     }
   ];
 
