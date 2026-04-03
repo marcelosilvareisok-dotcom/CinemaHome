@@ -11,11 +11,11 @@ export default function Player() {
   const [activeServer, setActiveServer] = useState(0);
   const [showControlsToast, setShowControlsToast] = useState(false);
 
-  // Apenas 1 servidor que reproduza os filmes TMDB
+  // API do EmbedMovies.org (myembed.biz) - Não requer chave de API!
   const servers = [
     {
-      name: 'Servidor Principal (Dublado/Legendado)',
-      url: `https://embed.warezcdn.net/${type === 'movie' ? 'filme' : 'serie'}/${id}`
+      name: 'Servidor Principal (EmbedMovies)',
+      url: `https://myembed.biz/${type === 'movie' ? 'filme' : 'serie'}/${id}`
     }
   ];
 
