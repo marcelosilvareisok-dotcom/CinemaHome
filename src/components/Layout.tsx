@@ -10,6 +10,9 @@ export default function Layout({ children }: LayoutProps) {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [showPioneerBanner, setShowPioneerBanner] = useState(() => {
+    return sessionStorage.getItem('hidePioneerBanner') !== 'true';
+  });
   const navigate = useNavigate();
 
   const handleSearch = (e: FormEvent) => {
@@ -20,6 +23,12 @@ export default function Layout({ children }: LayoutProps) {
       setSearchQuery('');
     }
   };
+
+  const handleCloseBanner = () => {
+    setShowPioneerBanner(false);
+    sessionStorage.setItem('hidePioneerBanner', 'true');
+  };
+
   const handleShare = async () => {
     const shareText = '🎬 Venha assistir aos melhores filmes e séries no CINEMAHOME! 🍿\nhttps://cinema-home.vercel.app/\n\nSe curtir, considere nos dar um apoio opcional para mantermos o projeto no ar! ❤️';
     
@@ -52,11 +61,20 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       {/* Banner Pioneiros */}
-      <div className="bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600 text-black text-center py-2 px-4 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md z-[60] relative">
-        <PartyPopper className="w-4 h-4 animate-bounce" />
-        <span>Parabéns! Você é um dos 100 primeiros (os pioneiros!). Acesso VIP liberado sem cadastro! Pegue a pipoca e aproveite! 🍿</span>
-        <PartyPopper className="w-4 h-4 animate-bounce" />
-      </div>
+      {showPioneerBanner && (
+        <div className="bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600 text-black text-center py-2 px-4 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md z-[60] relative">
+          <PartyPopper className="w-4 h-4 animate-bounce shrink-0" />
+          <span className="flex-1">Parabéns! Você é um dos 100 primeiros (os pioneiros!). Acesso VIP liberado sem cadastro! Pegue a pipoca e aproveite! 🍿</span>
+          <PartyPopper className="w-4 h-4 animate-bounce shrink-0 hidden sm:block" />
+          <button 
+            onClick={handleCloseBanner} 
+            className="p-1 hover:bg-black/10 rounded-full transition-colors shrink-0"
+            title="Fechar aviso"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       <nav className="flex items-center justify-between p-4 bg-black/80 sticky top-0 z-50 backdrop-blur-sm border-b border-zinc-900">
         <div className="flex items-center gap-8">
