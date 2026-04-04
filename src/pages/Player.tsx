@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Volume2, Settings2, MonitorPlay, Play, Pause, RotateCcw, RotateCw } from 'lucide-react';
+import { ArrowLeft, Volume2, Settings2, MonitorPlay, Play, Pause, RotateCcw, RotateCw, Tv } from 'lucide-react';
 import { getMovieDetails } from '../services/tmdb';
 import PremiumNotification from '../components/PremiumNotification';
 import { usePremium } from '../context/PremiumContext';
@@ -134,6 +134,10 @@ export default function Player() {
     setTimeout(() => setShowControlsToast(false), 4000);
   };
 
+  const handleCast = () => {
+    alert("Para transmitir para sua TV (Chromecast/Smart TV):\n\n1. Clique no menu do seu navegador (três pontos no canto superior direito).\n2. Selecione a opção 'Transmitir...' ou 'Cast'.\n3. Escolha sua TV na lista de dispositivos.");
+  };
+
   return (
     <div className="fixed inset-0 bg-black text-white z-50 flex flex-col">
       {/* Top Bar */}
@@ -148,6 +152,13 @@ export default function Player() {
 
         <div className="relative pointer-events-auto flex flex-col items-end gap-2">
           <div className="flex gap-2">
+            <button 
+              onClick={handleCast}
+              className="flex items-center gap-2 bg-black/50 hover:bg-black/80 px-3 py-2 rounded-full backdrop-blur-sm transition-all border border-zinc-800"
+              title="Transmitir para TV"
+            >
+              <Tv className="w-4 h-4 text-zinc-300" />
+            </button>
             <button 
               onClick={handleFakeControlClick}
               className="flex items-center gap-2 bg-black/50 hover:bg-black/80 px-3 py-2 rounded-full backdrop-blur-sm transition-all border border-zinc-800"
