@@ -6,8 +6,6 @@ import { getMovieDetails } from '../services/tmdb';
 export default function Player() {
   const { type, id } = useParams<{ type: string, id: string }>();
   const navigate = useNavigate();
-  const [status, setStatus] = useState<'searching' | 'playing'>('searching');
-  const [countdown, setCountdown] = useState(3);
   const [activeServer, setActiveServer] = useState(0);
   const [showControlsToast, setShowControlsToast] = useState(false);
 
@@ -20,16 +18,8 @@ export default function Player() {
   ];
 
   useEffect(() => {
-    if (status === 'searching') {
-      if (countdown > 0) {
-        const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-        return () => clearTimeout(timer);
-      } else {
-        setStatus('playing');
-        saveToHistory();
-      }
-    }
-  }, [countdown, status]);
+    saveToHistory();
+  }, []);
 
   const saveToHistory = async () => {
     try {
@@ -57,13 +47,6 @@ export default function Player() {
     }
   };
 
-  const handleNextServer = () => {
-    const nextServer = (activeServer + 1) % servers.length;
-    setActiveServer(nextServer);
-    setStatus('searching');
-    setCountdown(3); // Reinicia a contagem para o novo servidor
-  };
-
   const handleFakeControlClick = () => {
     setShowControlsToast(true);
     setTimeout(() => setShowControlsToast(false), 4000);
@@ -82,74 +65,43 @@ export default function Player() {
         </button>
 
         <div className="relative pointer-events-auto flex flex-col items-end gap-2">
-          {status === 'playing' && (
-            <>
-              <div className="flex gap-2">
-                <button 
-                  onClick={handleFakeControlClick}
-                  className="flex items-center gap-2 bg-black/50 hover:bg-black/80 px-3 py-2 rounded-full backdrop-blur-sm transition-all border border-zinc-800"
-                  title="Volume"
-                >
-                  <Volume2 className="w-4 h-4 text-zinc-300" />
-                </button>
-                <button 
-                  onClick={handleFakeControlClick}
-                  className="flex items-center gap-2 bg-black/50 hover:bg-black/80 px-3 py-2 rounded-full backdrop-blur-sm transition-all border border-zinc-800"
-                  title="Velocidade de Reprodução"
-                >
-                  <Settings2 className="w-4 h-4 text-zinc-300" />
-                  <span className="text-xs font-medium text-zinc-300">1x</span>
-                </button>
-              </div>
+          <div className="flex gap-2">
+            <button 
+              onClick={handleFakeControlClick}
+              className="flex items-center gap-2 bg-black/50 hover:bg-black/80 px-3 py-2 rounded-full backdrop-blur-sm transition-all border border-zinc-800"
+              title="Volume"
+            >
+              <Volume2 className="w-4 h-4 text-zinc-300" />
+            </button>
+            <button 
+              onClick={handleFakeControlClick}
+              className="flex items-center gap-2 bg-black/50 hover:bg-black/80 px-3 py-2 rounded-full backdrop-blur-sm transition-all border border-zinc-800"
+              title="Velocidade de Reprodução"
+            >
+              <Settings2 className="w-4 h-4 text-zinc-300" />
+              <span className="text-xs font-medium text-zinc-300">1x</span>
+            </button>
+          </div>
 
-              {showControlsToast && (
-                <div className="bg-zinc-900/90 border border-zinc-700 text-sm text-zinc-300 px-4 py-2 rounded-lg animate-in fade-in slide-in-from-top-2">
-                  Use os controles nativos dentro do player de vídeo abaixo para ajustar volume, tela cheia e velocidade.
-                </div>
-              )}
-            </>
+          {showControlsToast && (
+            <div className="bg-zinc-900/90 border border-zinc-700 text-sm text-zinc-300 px-4 py-2 rounded-lg animate-in fade-in slide-in-from-top-2">
+              Use os controles nativos dentro do player de vídeo abaixo para ajustar volume, tela cheia e velocidade.
+            </div>
           )}
         </div>
       </div>
 
       {/* Loading / Player */}
-      <div className="w-full h-full flex-1 flex items-center justify-center">
-        {status === 'searching' && (
-          <div className="flex flex-col items-center gap-8 animate-in fade-in duration-500">
-            <div className="relative flex items-center justify-center w-32 h-32">
-              <div className="absolute inset-0 bg-red-600/20 rounded-full animate-ping"></div>
-              <div className="absolute inset-0 bg-zinc-900/80 rounded-full border-4 border-red-600 flex items-center justify-center shadow-[0_0_30px_rgba(220,38,38,0.4)]">
-                <span 
-                  key={countdown} 
-                  className="text-6xl font-black text-white animate-in zoom-in duration-300"
-                >
-                  {countdown}
-                </span>
-              </div>
-            </div>
-            
-            <div className="flex flex-col items-center gap-4 text-center">
-              <h2 className="text-2xl font-bold text-zinc-200">Procurando servidor funcional... 🍿</h2>
-              
-              <div className="flex items-center gap-2 text-green-400 text-sm font-medium bg-green-400/10 px-4 py-2 rounded-full border border-green-400/20">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Testando: {servers[activeServer].name}</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {status === 'playing' && (
-          <iframe
-            className="w-full h-full animate-in fade-in duration-1000"
-            src={servers[activeServer].url}
-            title="Movie Player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
-          ></iframe>
-        )}
+      <div className="w-full h-full flex-1 flex items-center justify-center bg-black">
+        <iframe
+          className="w-full h-full animate-in fade-in duration-1000"
+          src={servers[activeServer].url}
+          title="Movie Player"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
+        ></iframe>
       </div>
     </div>
   );
