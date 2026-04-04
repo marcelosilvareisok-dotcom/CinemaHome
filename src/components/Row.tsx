@@ -83,25 +83,21 @@ export default function Row({ title, fetchData, isLargeRow = false }: RowProps) 
                 {/* Hover Info Overlay */}
                 <div className="absolute inset-0 bg-black/80 opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-md flex flex-col justify-end p-4">
                   <h3 className="text-white font-bold text-sm mb-2 line-clamp-1">{movie.title || movie.name}</h3>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 mt-2 w-full">
                     <button 
                       onClick={(e) => { e.stopPropagation(); navigate(`/play/${mediaType}/${movie.id}`); }}
-                      className="bg-white text-black p-1.5 rounded-full hover:bg-zinc-200 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-1 bg-white text-black py-1.5 px-2 rounded hover:bg-zinc-200 transition-colors font-bold text-xs"
                     >
-                      <Play className="w-4 h-4 fill-current" />
-                    </button>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); /* Add to list logic */ }}
-                      className="border border-zinc-400 text-white p-1.5 rounded-full hover:border-white transition-colors"
-                    >
-                      <Plus className="w-4 h-4" />
+                      <Play className="w-3 h-3 fill-current" />
+                      Assistir
                     </button>
                     <Link 
                       to={`/details/${mediaType}/${movie.id}`} 
                       onClick={(e) => e.stopPropagation()}
-                      className="border border-zinc-400 text-white p-1.5 rounded-full hover:border-white transition-colors ml-auto"
+                      className="flex-1 flex items-center justify-center gap-1 bg-zinc-800/80 text-white py-1.5 px-2 rounded hover:bg-zinc-700 transition-colors font-medium text-xs border border-zinc-600"
                     >
-                      <Info className="w-4 h-4" />
+                      <Info className="w-3 h-3" />
+                      Info
                     </Link>
                   </div>
                 </div>
