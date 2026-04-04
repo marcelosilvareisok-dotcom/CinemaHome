@@ -53,25 +53,25 @@ export default function Home() {
             {featured?.title || featured?.name}
           </h1>
           
-          <div className="flex gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <button 
               onClick={() => {
                 const mediaType = featured?.media_type || (featured?.name && !featured?.title ? 'tv' : 'movie');
                 featured && navigate(`/play/${mediaType}/${featured.id}`);
               }}
-              className="flex items-center gap-2 bg-white text-black px-6 py-2 md:px-8 md:py-3 rounded md:text-lg font-bold hover:bg-zinc-200 transition-colors"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white px-8 py-3 md:px-10 md:py-4 rounded-lg text-lg md:text-xl font-black hover:scale-105 transition-transform shadow-[0_0_30px_rgba(220,38,38,0.5)]"
             >
-              <Play className="w-5 h-5 md:w-6 md:h-6 fill-current" />
-              Assistir
+              <Play className="w-6 h-6 md:w-8 md:h-8 fill-current" />
+              Assistir Agora
             </button>
             <button 
               onClick={() => {
                 const mediaType = featured?.media_type || (featured?.name && !featured?.title ? 'tv' : 'movie');
                 featured && navigate(`/details/${mediaType}/${featured.id}`);
               }}
-              className="flex items-center gap-2 bg-zinc-500/70 text-white px-6 py-2 md:px-8 md:py-3 rounded md:text-lg font-bold hover:bg-zinc-500/90 transition-colors backdrop-blur-sm"
+              className="flex items-center justify-center gap-2 bg-zinc-800/80 text-white px-8 py-3 md:px-10 md:py-4 rounded-lg text-lg md:text-xl font-bold hover:bg-zinc-700 transition-colors backdrop-blur-md border border-zinc-600"
             >
-              <Info className="w-5 h-5 md:w-6 md:h-6" />
+              <Info className="w-6 h-6 md:w-8 md:h-8" />
               Mais Informações
             </button>
           </div>

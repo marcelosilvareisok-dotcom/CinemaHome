@@ -20,6 +20,8 @@ export default function Player() {
 
   useEffect(() => {
     saveToHistory();
+    
+    const startTime = Date.now();
 
     // Cleanup fullscreen and orientation on unmount
     return () => {
@@ -34,8 +36,38 @@ export default function Player() {
       } catch (error) {
         console.warn("Cleanup failed", error);
       }
+      
+      // Simulate progress saving on unmount
+      const timeSpentSeconds = Math.floor((Date.now() - startTime) / 1000);
+      updateProgressInHistory(timeSpentSeconds);
     };
   }, []);
+
+  const updateProgressInHistory = (secondsWatched: number) => {
+    try {
+      const currentHistory = JSON.parse(localStorage.getItem('cinemahome_history') || '[]');
+      const itemIndex = currentHistory.findIndex((item: any) => item.id === Number(id));
+      
+      if (itemIndex !== -1) {
+        // Simulate a total duration of 120 minutes (7200 seconds) for movies, 45 mins (2700s) for tv
+        const totalSeconds = type === 'movie' ? 7200 : 2700;
+        // Add previously watched time if exists
+        const previousProgress = currentHistory[itemIndex].progressSeconds || 0;
+        const newProgress = Math.min(previousProgress + secondsWatched, totalSeconds);
+        const progressPercentage = Math.round((newProgress / totalSeconds) * 100);
+        
+        currentHistory[itemIndex] = {
+          ...currentHistory[itemIndex],
+          progressSeconds: newProgress,
+          progressPercentage: progressPercentage
+        };
+        
+        localStorage.setItem('cinemahome_history', JSON.stringify(currentHistory));
+      }
+    } catch (error) {
+      console.error("Failed to update progress", error);
+    }
+  };
 
   const saveToHistory = async () => {
     try {

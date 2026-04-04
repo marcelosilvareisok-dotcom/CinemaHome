@@ -5,6 +5,7 @@ import { Play, Info, Trash2, Clock } from 'lucide-react';
 export default function MyList() {
   const [items, setItems] = useState<any[]>([]);
   const [history, setHistory] = useState<any[]>([]);
+  const [sortBy, setSortBy] = useState<'date' | 'title'>('date');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,6 +41,25 @@ export default function MyList() {
     setHistory([]);
     localStorage.removeItem('cinemahome_history');
   };
+
+  const clearMyList = () => {
+    if (window.confirm('Tem certeza que deseja remover todos os itens da sua lista?')) {
+      setItems([]);
+      localStorage.removeItem('cinemahome_mylist');
+    }
+  };
+
+  const sortedItems = [...items].sort((a, b) => {
+    if (sortBy === 'title') {
+      const titleA = a.title || a.name || '';
+      const titleB = b.title || b.name || '';
+      return titleA.localeCompare(titleB);
+    }
+    // Default to date (assuming items are added sequentially, we can just reverse or keep as is.
+    // If we don't have a date added field, we'll just use the array index for 'date added' (newest first usually).
+    // Let's assume the array order is the order they were added.
+    return 0; 
+  });
 
   return (
     <div className="pt-24 px-4 md:px-12 min-h-screen">
@@ -79,11 +99,11 @@ export default function MyList() {
                       <Play className="w-6 h-6 text-white fill-current" />
                     </div>
                   </div>
-                  {/* Fake progress bar */}
+                  {/* Progress bar */}
                   <div className="absolute bottom-0 left-0 w-full h-1 bg-zinc-600">
                     <div 
                       className="h-full bg-red-600" 
-                      style={{ width: `${Math.max(10, Math.random() * 80)}%` }}
+                      style={{ width: `${item.progressPercentage || 0}%` }}
                     ></div>
                   </div>
                 </div>
@@ -98,7 +118,30 @@ export default function MyList() {
       )}
 
       {/* Minha Lista Section */}
-      <h1 className="text-2xl md:text-3xl font-bold text-white mb-6">Minha Lista</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-white">Minha Lista</h1>
+        
+        {items.length > 0 && (
+          <div className="flex items-center gap-4">
+            <select 
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'date' | 'title')}
+              className="bg-zinc-900 border border-zinc-700 text-white text-sm rounded-md px-3 py-2 focus:outline-none focus:border-red-500"
+            >
+              <option value="date">Adicionados Recentemente</option>
+              <option value="title">Ordem Alfabética</option>
+            </select>
+            
+            <button 
+              onClick={clearMyList}
+              className="text-sm text-red-500 hover:text-red-400 transition-colors flex items-center gap-1"
+            >
+              <Trash2 className="w-4 h-4" />
+              Remover Todos
+            </button>
+          </div>
+        )}
+      </div>
 
       {items.length === 0 ? (
         <div className="text-zinc-500 text-center mt-20 text-lg">
@@ -106,7 +149,7 @@ export default function MyList() {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 pb-20">
-          {items.map((item) => {
+          {sortedItems.map((item) => {
             const itemType = item.media_type || (item.name && !item.title ? 'tv' : 'movie');
             return (
               <div 

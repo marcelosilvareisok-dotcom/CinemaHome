@@ -1,11 +1,23 @@
 import { useEffect, useState } from 'react';
 import { Play, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getPopularMovies, getActionMovies, getComedyMovies, getHorrorMovies, getRomanceMovies, getDocumentaries } from '../services/tmdb';
+import { getPopularMovies, getActionMovies, getComedyMovies, getHorrorMovies, getRomanceMovies, getDocumentaries, getMoviesByGenre } from '../services/tmdb';
 import Row from '../components/Row';
+
+const MOVIE_GENRES = [
+  { id: '', name: 'Todos' },
+  { id: '28', name: 'Ação' },
+  { id: '35', name: 'Comédia' },
+  { id: '27', name: 'Terror' },
+  { id: '10749', name: 'Romance' },
+  { id: '99', name: 'Documentários' },
+  { id: '878', name: 'Ficção Científica' },
+  { id: '18', name: 'Drama' },
+];
 
 export default function Movies() {
   const [featured, setFeatured] = useState<any>(null);
+  const [selectedGenre, setSelectedGenre] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,6 +51,24 @@ export default function Movies() {
           <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg max-w-2xl">
             {featured?.title || featured?.name}
           </h1>
+          
+          {/* Genre Filters */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {MOVIE_GENRES.map(genre => (
+              <button
+                key={genre.id}
+                onClick={() => setSelectedGenre(genre.id)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+                  selectedGenre === genre.id 
+                    ? 'bg-white text-black border-white' 
+                    : 'bg-black/50 text-white border-zinc-600 hover:border-white backdrop-blur-sm'
+                }`}
+              >
+                {genre.name}
+              </button>
+            ))}
+          </div>
+
           <div className="flex gap-4 mb-6">
             <button 
               onClick={() => featured && navigate(`/play/movie/${featured.id}`)} 
@@ -60,12 +90,18 @@ export default function Movies() {
       </header>
 
       <div className="-mt-24 relative z-10 pb-16 space-y-8">
-        <Row title="Filmes Populares" fetchData={getPopularMovies} isLargeRow />
-        <Row title="Ação e Aventura" fetchData={getActionMovies} />
-        <Row title="Comédias" fetchData={getComedyMovies} />
-        <Row title="Terror" fetchData={getHorrorMovies} />
-        <Row title="Romance" fetchData={getRomanceMovies} />
-        <Row title="Documentários" fetchData={getDocumentaries} />
+        {selectedGenre ? (
+          <Row title={`Resultados: ${MOVIE_GENRES.find(g => g.id === selectedGenre)?.name}`} fetchData={() => getMoviesByGenre(selectedGenre)} isLargeRow />
+        ) : (
+          <>
+            <Row title="Filmes Populares" fetchData={getPopularMovies} isLargeRow />
+            <Row title="Ação e Aventura" fetchData={getActionMovies} />
+            <Row title="Comédias" fetchData={getComedyMovies} />
+            <Row title="Terror" fetchData={getHorrorMovies} />
+            <Row title="Romance" fetchData={getRomanceMovies} />
+            <Row title="Documentários" fetchData={getDocumentaries} />
+          </>
+        )}
       </div>
     </div>
   );

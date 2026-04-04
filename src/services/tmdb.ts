@@ -94,6 +94,9 @@ export const getComedySeries = () => fetch100('/discover/tv?with_genres=35');
 export const getDramaSeries = () => fetch100('/discover/tv?with_genres=18');
 export const getSciFiSeries = () => fetch100('/discover/tv?with_genres=10765');
 
+export const getMoviesByGenre = (genreId: string) => fetch100(`/discover/movie?with_genres=${genreId}`);
+export const getSeriesByGenre = (genreId: string) => fetch100(`/discover/tv?with_genres=${genreId}`);
+
 export const getMovieDetails = (id: string, type: 'movie' | 'tv' = 'movie') => 
   withFallback(() => tmdbApi.get(`/${type}/${id}?append_to_response=videos,credits`), true);
 

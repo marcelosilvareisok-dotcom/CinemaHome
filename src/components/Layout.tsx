@@ -1,6 +1,6 @@
-import { useState, ReactNode, FormEvent } from 'react';
+import { useState, ReactNode, FormEvent, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Share2, X, Copy, Heart, MessageCircle, Search, PartyPopper } from 'lucide-react';
+import { ShieldCheck, Share2, X, Copy, Heart, MessageCircle, Search, PartyPopper, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface LayoutProps {
@@ -17,7 +17,25 @@ export default function Layout({ children }: LayoutProps) {
   const [showShareTutorial, setShowShareTutorial] = useState(() => {
     return localStorage.getItem('hasSeenShareTutorial') !== 'true';
   });
+  
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    return (localStorage.getItem('cinemahome_theme') as 'dark' | 'light') || 'dark';
+  });
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (theme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
+    localStorage.setItem('cinemahome_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -68,7 +86,7 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-300">
       {/* Banner Pioneiros */}
       {showPioneerBanner && (
         <div className="bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600 text-black text-center py-2 px-4 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md z-[60] relative">
@@ -85,18 +103,26 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       )}
 
-      <nav className="flex items-center justify-between p-4 bg-black/80 sticky top-0 z-50 backdrop-blur-sm border-b border-zinc-900">
+      <nav className="flex items-center justify-between p-4 bg-background/80 sticky top-0 z-50 backdrop-blur-sm border-b border-border transition-colors duration-300">
         <div className="flex items-center gap-8">
           <Link to="/" className="text-red-600 font-bold text-3xl tracking-tighter">CINEMAHOME</Link>
-          <div className="hidden md:flex gap-4 text-sm font-medium text-zinc-300">
-            <Link to="/" className="hover:text-white transition-colors">Início</Link>
-            <Link to="/series" className="hover:text-white transition-colors">Séries</Link>
-            <Link to="/movies" className="hover:text-white transition-colors">Filmes</Link>
-            <Link to="/trending" className="hover:text-white transition-colors">Bombando</Link>
-            <Link to="/my-list" className="hover:text-white transition-colors">Minha Lista</Link>
+          <div className="hidden md:flex gap-4 text-sm font-medium text-foreground/70">
+            <Link to="/" className="hover:text-foreground transition-colors">Início</Link>
+            <Link to="/series" className="hover:text-foreground transition-colors">Séries</Link>
+            <Link to="/movies" className="hover:text-foreground transition-colors">Filmes</Link>
+            <Link to="/trending" className="hover:text-foreground transition-colors">Bombando</Link>
+            <Link to="/my-list" className="hover:text-foreground transition-colors">Minha Lista</Link>
           </div>
         </div>
         <div className="flex items-center gap-4">
+          <button
+            onClick={toggleTheme}
+            className="text-foreground p-2 hover:text-foreground/70 transition-colors"
+            title="Alternar Tema"
+          >
+            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+
           {/* Search Bar */}
           <div className="relative flex items-center">
             <form 
@@ -108,13 +134,13 @@ export default function Layout({ children }: LayoutProps) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Títulos, gente e gêneros"
-                className="w-full bg-black/50 border border-white/80 text-white text-sm px-3 py-1.5 focus:outline-none focus:border-white transition-colors"
+                className="w-full bg-background/50 border border-border text-foreground text-sm px-3 py-1.5 focus:outline-none focus:border-foreground transition-colors"
                 autoFocus={isSearchOpen}
               />
             </form>
             <button 
               onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="text-white p-2 hover:text-zinc-300 transition-colors"
+              className="text-foreground p-2 hover:text-foreground/70 transition-colors"
               title="Pesquisar"
             >
               <Search className="w-5 h-5" />

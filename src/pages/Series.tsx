@@ -1,11 +1,22 @@
 import { useEffect, useState } from 'react';
 import { Play, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getPopularSeries, getNetflixOriginals, getActionSeries, getComedySeries, getDramaSeries, getSciFiSeries } from '../services/tmdb';
+import { getPopularSeries, getNetflixOriginals, getActionSeries, getComedySeries, getDramaSeries, getSciFiSeries, getSeriesByGenre } from '../services/tmdb';
 import Row from '../components/Row';
+
+const SERIES_GENRES = [
+  { id: '', name: 'Todos' },
+  { id: '10759', name: 'Ação e Aventura' },
+  { id: '35', name: 'Comédia' },
+  { id: '18', name: 'Drama' },
+  { id: '10765', name: 'Ficção Científica e Fantasia' },
+  { id: '9648', name: 'Mistério' },
+  { id: '16', name: 'Animação' },
+];
 
 export default function Series() {
   const [featured, setFeatured] = useState<any>(null);
+  const [selectedGenre, setSelectedGenre] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,6 +50,24 @@ export default function Series() {
           <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg max-w-2xl">
             {featured?.title || featured?.name}
           </h1>
+
+          {/* Genre Filters */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {SERIES_GENRES.map(genre => (
+              <button
+                key={genre.id}
+                onClick={() => setSelectedGenre(genre.id)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+                  selectedGenre === genre.id 
+                    ? 'bg-white text-black border-white' 
+                    : 'bg-black/50 text-white border-zinc-600 hover:border-white backdrop-blur-sm'
+                }`}
+              >
+                {genre.name}
+              </button>
+            ))}
+          </div>
+
           <div className="flex gap-4 mb-6">
             <button 
               onClick={() => featured && navigate(`/play/tv/${featured.id}`)} 
@@ -60,12 +89,18 @@ export default function Series() {
       </header>
 
       <div className="-mt-24 relative z-10 pb-16 space-y-8">
-        <Row title="Séries Populares" fetchData={getPopularSeries} isLargeRow />
-        <Row title="Originais Netflix" fetchData={getNetflixOriginals} />
-        <Row title="Ação e Aventura" fetchData={getActionSeries} />
-        <Row title="Comédias" fetchData={getComedySeries} />
-        <Row title="Drama" fetchData={getDramaSeries} />
-        <Row title="Ficção Científica e Fantasia" fetchData={getSciFiSeries} />
+        {selectedGenre ? (
+          <Row title={`Resultados: ${SERIES_GENRES.find(g => g.id === selectedGenre)?.name}`} fetchData={() => getSeriesByGenre(selectedGenre)} isLargeRow />
+        ) : (
+          <>
+            <Row title="Séries Populares" fetchData={getPopularSeries} isLargeRow />
+            <Row title="Originais Netflix" fetchData={getNetflixOriginals} />
+            <Row title="Ação e Aventura" fetchData={getActionSeries} />
+            <Row title="Comédias" fetchData={getComedySeries} />
+            <Row title="Drama" fetchData={getDramaSeries} />
+            <Row title="Ficção Científica e Fantasia" fetchData={getSciFiSeries} />
+          </>
+        )}
       </div>
     </div>
   );
