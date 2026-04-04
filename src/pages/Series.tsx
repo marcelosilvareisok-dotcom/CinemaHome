@@ -3,6 +3,7 @@ import { Play, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getPopularSeries, getNetflixOriginals, getActionSeries, getComedySeries, getDramaSeries, getSciFiSeries, getSeriesByGenre } from '../services/tmdb';
 import Row from '../components/Row';
+import AdBanner from '../components/AdBanner';
 
 const SERIES_GENRES = [
   { id: '', name: 'Todos' },
@@ -94,8 +95,18 @@ export default function Series() {
         ) : (
           <>
             <Row title="Séries Populares" fetchData={getPopularSeries} isLargeRow />
+            
+            <div className="px-4 md:px-12 py-4">
+              <AdBanner />
+            </div>
+
             <Row title="Originais Netflix" fetchData={getNetflixOriginals} />
             <Row title="Ação e Aventura" fetchData={getActionSeries} />
+            
+            <div className="px-4 md:px-12 py-4">
+              <AdBanner />
+            </div>
+
             <Row title="Comédias" fetchData={getComedySeries} />
             <Row title="Drama" fetchData={getDramaSeries} />
             <Row title="Ficção Científica e Fantasia" fetchData={getSciFiSeries} />

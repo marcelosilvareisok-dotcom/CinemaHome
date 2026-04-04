@@ -3,6 +3,7 @@ import { Play, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getPopularMovies, getActionMovies, getComedyMovies, getHorrorMovies, getRomanceMovies, getDocumentaries, getMoviesByGenre } from '../services/tmdb';
 import Row from '../components/Row';
+import AdBanner from '../components/AdBanner';
 
 const MOVIE_GENRES = [
   { id: '', name: 'Todos' },
@@ -95,8 +96,18 @@ export default function Movies() {
         ) : (
           <>
             <Row title="Filmes Populares" fetchData={getPopularMovies} isLargeRow />
+            
+            <div className="px-4 md:px-12 py-4">
+              <AdBanner />
+            </div>
+
             <Row title="Ação e Aventura" fetchData={getActionMovies} />
             <Row title="Comédias" fetchData={getComedyMovies} />
+            
+            <div className="px-4 md:px-12 py-4">
+              <AdBanner />
+            </div>
+
             <Row title="Terror" fetchData={getHorrorMovies} />
             <Row title="Romance" fetchData={getRomanceMovies} />
             <Row title="Documentários" fetchData={getDocumentaries} />

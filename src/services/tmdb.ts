@@ -14,11 +14,11 @@ const tmdbApi = axios.create({
 // Mock data fallback for when API key is missing or invalid
 const mockMovie = {
   id: 1,
-  title: "CINEMAHOME Original",
-  name: "CINEMAHOME Series",
+  title: "Cinema em Casa Original",
+  name: "Cinema em Casa Series",
   poster_path: "/xJWPZIYOEFIjZpQ7sBJTFi5lsPT.jpg", // Example TMDB paths
   backdrop_path: "/xJWPZIYOEFIjZpQ7sBJTFi5lsPT.jpg",
-  overview: "Bem-vindo ao CINEMAHOME. Adicione sua chave da API do TMDB (VITE_TMDB_API_KEY) nos Secrets para ver filmes reais. Este é um conteúdo de demonstração.",
+  overview: "Bem-vindo ao Cinema em Casa. Adicione sua chave da API do TMDB (VITE_TMDB_API_KEY) nos Secrets para ver filmes reais. Este é um conteúdo de demonstração.",
   media_type: "movie",
   videos: {
     results: [

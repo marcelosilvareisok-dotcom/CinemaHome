@@ -14,7 +14,7 @@ export default function PlanSuccess() {
         <h1 className="text-3xl font-bold mb-4">Assinatura Concluída!</h1>
         
         <p className="text-zinc-400 mb-8 text-lg">
-          Bem-vindo ao CINEMAHOME Premium. Seus 30 dias grátis já começaram. 
+          Bem-vindo ao Cinema em Casa Premium. Seus 30 dias grátis já começaram. 
           Aproveite o melhor do cinema!
         </p>
 

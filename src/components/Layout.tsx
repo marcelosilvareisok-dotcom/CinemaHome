@@ -1,7 +1,8 @@
 import { useState, ReactNode, FormEvent, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Share2, X, Copy, Heart, MessageCircle, Search, PartyPopper, Sun, Moon } from 'lucide-react';
+import { ShieldCheck, Share2, X, Copy, Heart, MessageCircle, Search, PartyPopper, Sun, Moon, Crown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { usePremium } from '../context/PremiumContext';
 
 interface LayoutProps {
   children: ReactNode;
@@ -22,6 +23,7 @@ export default function Layout({ children }: LayoutProps) {
     return (localStorage.getItem('cinemahome_theme') as 'dark' | 'light') || 'dark';
   });
 
+  const { isPremium, setPremium } = usePremium();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,10 +59,10 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   const handleShare = async () => {
-    const shareText = '🎬 Venha assistir aos melhores filmes e séries no CINEMAHOME! 🍿\nhttps://cinema-home.vercel.app/\n\nSe curtir, considere nos dar um apoio opcional para mantermos o projeto no ar! ❤️';
+    const shareText = '🎬 Venha assistir aos melhores filmes e séries no Cinema em Casa! 🍿\nhttps://cinema-em-casa.vercel.app/\n\nSe curtir, considere nos dar um apoio opcional para mantermos o projeto no ar! ❤️';
     
     const shareData = {
-      title: 'CINEMAHOME',
+      title: 'Cinema em Casa',
       text: shareText,
     };
 
@@ -105,7 +107,9 @@ export default function Layout({ children }: LayoutProps) {
 
       <nav className="flex items-center justify-between p-4 bg-background/80 sticky top-0 z-50 backdrop-blur-sm border-b border-border transition-colors duration-300">
         <div className="flex items-center gap-8">
-          <Link to="/" className="text-red-600 font-bold text-3xl tracking-tighter">CINEMAHOME</Link>
+          <Link to="/" className="text-red-600 font-bold text-2xl md:text-3xl tracking-tighter flex items-center gap-2">
+            Cinema em Casa <span className="text-xl">📽️</span>
+          </Link>
           <div className="hidden md:flex gap-4 text-sm font-medium text-foreground/70">
             <Link to="/" className="hover:text-foreground transition-colors">Início</Link>
             <Link to="/series" className="hover:text-foreground transition-colors">Séries</Link>
@@ -186,7 +190,7 @@ export default function Layout({ children }: LayoutProps) {
                       </button>
                     </div>
                     <p className="text-sm text-zinc-300 mb-5 leading-relaxed">
-                      Compartilhe o <strong>CINEMAHOME</strong> com seus amigos e familiares para que eles também possam curtir filmes e séries de graça!
+                      Compartilhe o <strong>Cinema em Casa</strong> com seus amigos e familiares para que eles também possam curtir filmes e séries de graça!
                     </p>
                     <button 
                       onClick={handleCloseTutorial}
@@ -222,7 +226,7 @@ export default function Layout({ children }: LayoutProps) {
             
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
               <Heart className="w-6 h-6 text-red-500 fill-current" />
-              Apoie o CINEMAHOME
+              Apoie o Cinema em Casa
             </h2>
             
             <div className="space-y-6">
@@ -244,28 +248,51 @@ export default function Layout({ children }: LayoutProps) {
                 </button>
               </div>
 
-              {/* Option 2: PIX */}
+              {/* Option 2: PIX / Premium */}
               <div className="bg-zinc-800/50 p-4 rounded-lg border border-zinc-700/50">
                 <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-red-500" />
-                  Apoio Voluntário (PIX)
+                  <Crown className="w-5 h-5 text-yellow-500" />
+                  Seja Premium (R$ 9,99/mês)
                 </h3>
                 <p className="text-sm text-zinc-400 mb-4">
-                  Este projeto é gratuito. Se você curte e quer ajudar a manter os servidores no ar, considere fazer uma doação de qualquer valor. É 100% opcional! ❤️
+                  Apoie o projeto com R$ 9,99/mês via PIX para remover todos os anúncios e ajudar a manter os servidores no ar! ❤️
                 </p>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 bg-black px-3 py-3 rounded text-red-400 font-mono text-center select-all text-lg tracking-wider">
-                    94991233751
-                  </code>
-                  <button 
-                    onClick={handleCopyPix}
-                    className="bg-red-600 hover:bg-red-700 text-white p-3 rounded transition-colors flex items-center justify-center"
-                    title="Copiar PIX"
-                  >
-                    <Copy className="w-5 h-5" />
-                  </button>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 bg-black px-3 py-3 rounded text-red-400 font-mono text-center select-all text-lg tracking-wider">
+                      94991233751
+                    </code>
+                    <button 
+                      onClick={handleCopyPix}
+                      className="bg-red-600 hover:bg-red-700 text-white p-3 rounded transition-colors flex items-center justify-center"
+                      title="Copiar PIX"
+                    >
+                      <Copy className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-zinc-500 text-center">Chave Celular do Desenvolvedor</p>
+                  
+                  {!isPremium ? (
+                    <button 
+                      onClick={() => {
+                        if (window.confirm('Ao clicar aqui, você confirma que enviou o PIX de R$ 9,99. O administrador irá verificar e liberar seu acesso Premium em breve. (Para fins de demonstração, o acesso será liberado imediatamente).')) {
+                          setPremium(true);
+                          setIsShareModalOpen(false);
+                          alert('Obrigado pelo apoio! Seu acesso Premium foi ativado.');
+                        }
+                      }}
+                      className="w-full mt-2 bg-gradient-to-r from-yellow-600 to-yellow-500 text-black font-bold py-2.5 rounded hover:from-yellow-500 hover:to-yellow-400 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Crown className="w-5 h-5" />
+                      Já enviei o PIX (Ativar Premium)
+                    </button>
+                  ) : (
+                    <div className="w-full mt-2 bg-green-900/50 text-green-400 font-bold py-2.5 rounded border border-green-800 flex items-center justify-center gap-2">
+                      <ShieldCheck className="w-5 h-5" />
+                      Você já é Premium!
+                    </div>
+                  )}
                 </div>
-                <p className="text-xs text-zinc-500 mt-2 text-center">Chave Celular do Desenvolvedor</p>
               </div>
             </div>
           </div>

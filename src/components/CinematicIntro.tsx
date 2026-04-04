@@ -27,7 +27,7 @@ export default function CinematicIntro() {
           className="text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-red-500 to-red-800"
           style={{ WebkitTextStroke: '1px rgba(255,0,0,0.3)' }}
         >
-          CINEMAHOME
+          Cinema em Casa 📽️
         </h1>
         
         {/* Intense red glow behind text */}

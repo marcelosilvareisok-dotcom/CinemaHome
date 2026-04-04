@@ -14,8 +14,8 @@ export default defineConfig(({mode}) => {
         registerType: 'autoUpdate',
         includeAssets: ['icon.svg'],
         manifest: {
-          name: 'CINEMAHOME',
-          short_name: 'CINEMAHOME',
+          name: 'Cinema em Casa',
+          short_name: 'Cinema em Casa',
           description: 'Plataforma de streaming de filmes e séries',
           theme_color: '#000000',
           background_color: '#000000',

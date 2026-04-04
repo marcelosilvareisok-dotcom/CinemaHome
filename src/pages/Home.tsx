@@ -84,7 +84,7 @@ export default function Home() {
 
       {/* Rows */}
       <div className="-mt-24 relative z-10 pb-16 space-y-8">
-        <Row title="Originais CINEMAHOME" fetchData={getNetflixOriginals} isLargeRow />
+        <Row title="Originais Cinema em Casa" fetchData={getNetflixOriginals} isLargeRow />
         <Row title="Em Alta" fetchData={getTrending} />
         
         <div className="px-4 md:px-12 py-4">

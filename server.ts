@@ -60,7 +60,7 @@ async function startServer() {
 
       const response = await plan.create({
         body: {
-          reason: "CINEMAHOME - Plano Mensal",
+          reason: "Cinema em Casa - Plano Mensal",
           auto_recurring: {
             frequency: 1,
             frequency_type: "months",

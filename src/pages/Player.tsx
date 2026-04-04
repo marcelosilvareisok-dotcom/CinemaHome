@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Check, AlertTriangle, Volume2, Settings2, Loader2, MonitorPlay, Smartphone } from 'lucide-react';
 import { getMovieDetails } from '../services/tmdb';
+import AdBanner from '../components/AdBanner';
 
 export default function Player() {
   const { type, id } = useParams<{ type: string, id: string }>();
@@ -159,6 +160,10 @@ export default function Player() {
               Cancelar
             </button>
           </div>
+        </div>
+        
+        <div className="mt-8 w-full max-w-md">
+          <AdBanner />
         </div>
       </div>
     );
