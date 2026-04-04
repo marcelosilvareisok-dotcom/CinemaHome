@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Volume2, Settings2, MonitorPlay } from 'lucide-react';
+import { ArrowLeft, Volume2, Settings2, MonitorPlay, Play, Pause, RotateCcw, RotateCw } from 'lucide-react';
 import { getMovieDetails } from '../services/tmdb';
+import PremiumNotification from '../components/PremiumNotification';
+import { usePremium } from '../context/PremiumContext';
 
 export default function Player() {
   const { type, id } = useParams<{ type: string, id: string }>();
   const navigate = useNavigate();
   const [activeServer, setActiveServer] = useState(0);
   const [showControlsToast, setShowControlsToast] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const { isPremium } = usePremium();
 
   // API do EmbedMovies.org (myembed.biz) - Não requer chave de API!
   const servers = [
@@ -61,6 +67,15 @@ export default function Player() {
       updateProgressInHistory(timeSpentSeconds);
     };
   }, []);
+
+  useEffect(() => {
+    if (isPlaying) {
+      const interval = setInterval(() => {
+        setProgress((prev) => Math.min(prev + 1, 100));
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isPlaying]);
 
   const updateProgressInHistory = (secondsWatched: number) => {
     try {
@@ -159,7 +174,7 @@ export default function Player() {
       </div>
 
       {/* Loading / Player */}
-      <div className="w-full h-full flex-1 flex items-center justify-center bg-black">
+      <div className="w-full h-full flex-1 flex items-center justify-center bg-black relative">
         <iframe
           className="w-full h-full animate-in fade-in duration-1000"
           src={servers[activeServer].url}
@@ -169,7 +184,31 @@ export default function Player() {
           allowFullScreen
           sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
         ></iframe>
+
+        {/* Simulated Controls Overlay */}
+        <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/90 to-transparent flex flex-col gap-4">
+          <div className="w-full bg-zinc-700 h-1.5 rounded-full cursor-pointer" onClick={() => setProgress(50)}>
+            <div className="bg-red-600 h-1.5 rounded-full" style={{ width: `${progress}%` }}></div>
+          </div>
+          <div className="flex items-center gap-6">
+            <button onClick={() => setIsPlaying(!isPlaying)} className="text-white hover:text-red-500">
+              {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
+            </button>
+            <button onClick={() => setProgress(p => Math.max(p - 10, 0))} className="text-white hover:text-red-500">
+              <RotateCcw className="w-6 h-6" />
+            </button>
+            <button onClick={() => setProgress(p => Math.min(p + 10, 100))} className="text-white hover:text-red-500">
+              <RotateCw className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
       </div>
+      
+      <PremiumNotification 
+        isOpen={showPremiumModal} 
+        onClose={() => setShowPremiumModal(false)} 
+        feature="Controles Avançados de Reprodução" 
+      />
     </div>
   );
 }

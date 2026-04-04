@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Play, Plus, Check, ArrowLeft, Star, Calendar, Download } from 'lucide-react';
 import { getMovieDetails } from '../services/tmdb';
 import AdBanner from '../components/AdBanner';
+import PremiumNotification from '../components/PremiumNotification';
+import { usePremium } from '../context/PremiumContext';
 
 export default function Details() {
   const { type, id } = useParams<{ type: string, id: string }>();
@@ -11,6 +13,8 @@ export default function Details() {
   const [loading, setLoading] = useState(true);
   const [inList, setInList] = useState(false);
   const [isDownloaded, setIsDownloaded] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const { isPremium } = usePremium();
 
   useEffect(() => {
     async function fetchDetails() {
@@ -60,6 +64,10 @@ export default function Details() {
   };
 
   const toggleDownload = () => {
+    if (!isPremium) {
+      setShowPremiumModal(true);
+      return;
+    }
     if (!movie) return;
     
     const savedDownloads = localStorage.getItem('cinemahome_downloads');
@@ -208,6 +216,11 @@ export default function Details() {
         <div className="mt-16">
           <AdBanner />
         </div>
+        <PremiumNotification 
+          isOpen={showPremiumModal} 
+          onClose={() => setShowPremiumModal(false)} 
+          feature="Downloads Offline" 
+        />
       </div>
     </div>
   );

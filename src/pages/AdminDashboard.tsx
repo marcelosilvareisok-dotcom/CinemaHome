@@ -159,13 +159,13 @@ export default function AdminDashboard() {
                 <Database className="w-5 h-5 text-purple-400" />
                 Banco de Dados
               </h3>
-              <div className={`w-3 h-3 rounded-full ${health?.services.database === 'connected' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <div className={`w-3 h-3 rounded-full ${health?.services.database === 'connected' ? 'bg-green-500' : health?.services.database === 'missing_key' ? 'bg-yellow-500' : 'bg-red-500'}`}></div>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-zinc-500">Conexão</span>
-                <span className={health?.services.database === 'connected' ? 'text-green-400' : 'text-red-400'}>
-                  {health?.services.database === 'connected' ? 'Estável' : 'Falha'}
+                <span className={health?.services.database === 'connected' ? 'text-green-400' : health?.services.database === 'missing_key' ? 'text-yellow-400' : 'text-red-400'}>
+                  {health?.services.database === 'connected' ? 'Estável' : health?.services.database === 'missing_key' ? 'Chave Ausente' : 'Falha'}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
