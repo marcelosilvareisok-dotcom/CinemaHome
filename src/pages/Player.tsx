@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, AlertTriangle, Volume2, Settings2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Check, AlertTriangle, Volume2, Settings2, Loader2, MonitorPlay, Smartphone } from 'lucide-react';
 import { getMovieDetails } from '../services/tmdb';
 
 export default function Player() {
@@ -8,6 +8,7 @@ export default function Player() {
   const navigate = useNavigate();
   const [activeServer, setActiveServer] = useState(0);
   const [showControlsToast, setShowControlsToast] = useState(false);
+  const [isCinemaModeConfirmed, setIsCinemaModeConfirmed] = useState(false);
 
   // API do EmbedMovies.org (myembed.biz) - Não requer chave de API!
   const servers = [
@@ -19,6 +20,21 @@ export default function Player() {
 
   useEffect(() => {
     saveToHistory();
+
+    // Cleanup fullscreen and orientation on unmount
+    return () => {
+      try {
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        }
+        const orientation = (window.screen.orientation as any);
+        if (orientation && orientation.unlock) {
+          orientation.unlock();
+        }
+      } catch (error) {
+        console.warn("Cleanup failed", error);
+      }
+    };
   }, []);
 
   const saveToHistory = async () => {
@@ -51,6 +67,70 @@ export default function Player() {
     setShowControlsToast(true);
     setTimeout(() => setShowControlsToast(false), 4000);
   };
+
+  const handleConfirmCinemaMode = async () => {
+    try {
+      const docElm = document.documentElement;
+      if (docElm.requestFullscreen) {
+        await docElm.requestFullscreen();
+      }
+      
+      // Attempt to lock orientation to landscape
+      const orientation = (window.screen.orientation as any);
+      if (orientation && orientation.lock) {
+        await orientation.lock('landscape');
+      }
+    } catch (error) {
+      console.warn("Fullscreen or orientation lock failed. Proceeding anyway.", error);
+    }
+    setIsCinemaModeConfirmed(true);
+  };
+
+  if (!isCinemaModeConfirmed) {
+    return (
+      <div className="fixed inset-0 bg-zinc-950 text-white z-50 flex flex-col items-center justify-center p-6">
+        <div className="absolute top-0 left-0 w-full p-4 z-50">
+          <button 
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors bg-zinc-900/50 px-4 py-2 rounded-full backdrop-blur-sm"
+          >
+            <ArrowLeft className="w-6 h-6" />
+            <span className="font-medium">Voltar</span>
+          </button>
+        </div>
+
+        <div className="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center shadow-2xl animate-in zoom-in-95 duration-300">
+          <div className="flex justify-center mb-6 relative">
+            <div className="absolute inset-0 bg-red-600/20 blur-2xl rounded-full"></div>
+            <div className="relative bg-zinc-800 p-4 rounded-full border border-zinc-700">
+              <MonitorPlay className="w-12 h-12 text-red-500" />
+            </div>
+          </div>
+          
+          <h2 className="text-2xl font-bold mb-3 text-white">Modo Cinema</h2>
+          <p className="text-zinc-400 mb-8 leading-relaxed">
+            Você será redirecionado para o modo cinema (widescreen) para uma melhor experiência. Recomendamos virar o seu celular.
+          </p>
+
+          <div className="flex flex-col gap-3">
+            <button 
+              onClick={handleConfirmCinemaMode}
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:shadow-[0_0_30px_rgba(220,38,38,0.6)] flex items-center justify-center gap-2"
+            >
+              <Check className="w-5 h-5" />
+              Confirmar e Assistir
+            </button>
+            <button 
+              onClick={() => navigate(-1)}
+              className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium py-3.5 px-6 rounded-xl transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black text-white z-50 flex flex-col">
