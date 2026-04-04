@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Volume2, Settings2, MonitorPlay, Play, Pause, RotateCcw, RotateCw, Tv, AlertTriangle, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Volume2, Settings2, MonitorPlay, Play, Pause, RotateCcw, RotateCw, Tv, ExternalLink } from 'lucide-react';
 import { getMovieDetails } from '../services/tmdb';
 import PremiumNotification from '../components/PremiumNotification';
 import { usePremium } from '../context/PremiumContext';
@@ -13,7 +13,6 @@ export default function Player() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [progress, setProgress] = useState(0);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [isBlockedBySandbox, setIsBlockedBySandbox] = useState(false);
   const { isPremium } = usePremium();
 
   // API do EmbedMovies.org (myembed.biz) - Não requer chave de API!
@@ -25,19 +24,6 @@ export default function Player() {
   ];
 
   useEffect(() => {
-    // Detecta se está rodando dentro de um iframe restrito (como o preview do AI Studio)
-    // Onde o provedor vai bloquear e mostrar a tela de erro "SANDBOX DETECTADO".
-    if (window.self !== window.top) {
-      setIsBlockedBySandbox(true);
-      
-      // Redireciona após 5 segundos para a home
-      const timer = setTimeout(() => {
-        navigate('/');
-      }, 5000);
-      
-      return () => clearTimeout(timer);
-    }
-
     saveToHistory();
     
     const startTime = Date.now();
@@ -80,16 +66,16 @@ export default function Player() {
       const timeSpentSeconds = Math.floor((Date.now() - startTime) / 1000);
       updateProgressInHistory(timeSpentSeconds);
     };
-  }, [navigate, id, type]);
+  }, [id, type]);
 
   useEffect(() => {
-    if (isPlaying && !isBlockedBySandbox) {
+    if (isPlaying) {
       const interval = setInterval(() => {
         setProgress((prev) => Math.min(prev + 1, 100));
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [isPlaying, isBlockedBySandbox]);
+  }, [isPlaying]);
 
   const updateProgressInHistory = (secondsWatched: number) => {
     try {
@@ -152,41 +138,29 @@ export default function Player() {
     alert("Para transmitir para sua TV (Chromecast/Smart TV):\n\n1. Clique no menu do seu navegador (três pontos no canto superior direito).\n2. Selecione a opção 'Transmitir...' ou 'Cast'.\n3. Escolha sua TV na lista de dispositivos.");
   };
 
-  if (isBlockedBySandbox) {
-    return (
-      <div className="fixed inset-0 bg-zinc-950 text-white z-50 flex flex-col items-center justify-center p-4 text-center">
-        <AlertTriangle className="w-16 h-16 text-yellow-500 mb-6 animate-pulse" />
-        <h1 className="text-2xl md:text-3xl font-bold mb-4">Conteúdo Temporariamente Indisponível</h1>
-        <p className="text-zinc-400 max-w-md mb-8 text-lg">
-          Poxa, este filme/série foi removido temporariamente dos nossos servidores principais para manutenção de qualidade.
-        </p>
-        <div className="flex items-center gap-3 text-sm text-zinc-500 mb-8">
-          <RefreshCw className="w-4 h-4 animate-spin" />
-          Redirecionando você para o catálogo...
-        </div>
-        
-        <button 
-          onClick={() => window.open(window.location.href, '_blank')}
-          className="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg font-bold transition-colors flex items-center gap-2"
-        >
-          <MonitorPlay className="w-5 h-5" />
-          Tentar Forçar Reprodução (Nova Guia)
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="fixed inset-0 bg-black text-white z-50 flex flex-col">
       {/* Top Bar */}
       <div className="absolute top-0 left-0 w-full p-4 z-50 flex justify-between items-start bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
-        <button 
-          onClick={() => navigate(-1)}
-          className="pointer-events-auto flex items-center gap-2 text-white hover:text-red-500 transition-colors bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm"
-        >
-          <ArrowLeft className="w-6 h-6" />
-          <span className="font-medium">Voltar</span>
-        </button>
+        <div className="flex items-center gap-4 pointer-events-auto">
+          <button 
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-white hover:text-red-500 transition-colors bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm"
+          >
+            <ArrowLeft className="w-6 h-6" />
+            <span className="font-medium hidden sm:inline">Voltar</span>
+          </button>
+          
+          <button 
+            onClick={() => window.open(window.location.href, '_blank')}
+            className="flex items-center gap-2 bg-red-600/90 hover:bg-red-600 px-4 py-2 rounded-full backdrop-blur-sm transition-all border border-red-500/50 text-sm font-bold shadow-lg shadow-red-900/20"
+            title="Abrir em nova guia (Resolve erro de Sandbox)"
+          >
+            <ExternalLink className="w-4 h-4" />
+            <span className="hidden sm:inline">Erro no vídeo? Abrir Nova Guia</span>
+            <span className="sm:hidden">Nova Guia</span>
+          </button>
+        </div>
 
         <div className="relative pointer-events-auto flex flex-col items-end gap-2">
           <div className="flex gap-2">
@@ -234,11 +208,11 @@ export default function Player() {
         ></iframe>
 
         {/* Simulated Controls Overlay */}
-        <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/90 to-transparent flex flex-col gap-4">
-          <div className="w-full bg-zinc-700 h-1.5 rounded-full cursor-pointer" onClick={() => setProgress(50)}>
+        <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/90 to-transparent flex flex-col gap-4 pointer-events-none">
+          <div className="w-full bg-zinc-700 h-1.5 rounded-full cursor-pointer pointer-events-auto" onClick={() => setProgress(50)}>
             <div className="bg-red-600 h-1.5 rounded-full" style={{ width: `${progress}%` }}></div>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 pointer-events-auto">
             <button onClick={() => setIsPlaying(!isPlaying)} className="text-white hover:text-red-500">
               {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
             </button>
