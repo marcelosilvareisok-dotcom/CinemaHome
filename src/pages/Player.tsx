@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Volume2, Settings2, MonitorPlay, Play, Pause, RotateCcw, RotateCw, Tv } from 'lucide-react';
+import { ArrowLeft, Volume2, Settings2, MonitorPlay, Play, Pause, RotateCcw, RotateCw, Tv, AlertTriangle, RefreshCw } from 'lucide-react';
 import { getMovieDetails } from '../services/tmdb';
 import PremiumNotification from '../components/PremiumNotification';
 import { usePremium } from '../context/PremiumContext';
@@ -13,6 +13,7 @@ export default function Player() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [progress, setProgress] = useState(0);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [isBlockedBySandbox, setIsBlockedBySandbox] = useState(false);
   const { isPremium } = usePremium();
 
   // API do EmbedMovies.org (myembed.biz) - Não requer chave de API!
@@ -24,6 +25,19 @@ export default function Player() {
   ];
 
   useEffect(() => {
+    // Detecta se está rodando dentro de um iframe restrito (como o preview do AI Studio)
+    // Onde o provedor vai bloquear e mostrar a tela de erro "SANDBOX DETECTADO".
+    if (window.self !== window.top) {
+      setIsBlockedBySandbox(true);
+      
+      // Redireciona após 5 segundos para a home
+      const timer = setTimeout(() => {
+        navigate('/');
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+
     saveToHistory();
     
     const startTime = Date.now();
@@ -66,16 +80,16 @@ export default function Player() {
       const timeSpentSeconds = Math.floor((Date.now() - startTime) / 1000);
       updateProgressInHistory(timeSpentSeconds);
     };
-  }, []);
+  }, [navigate, id, type]);
 
   useEffect(() => {
-    if (isPlaying) {
+    if (isPlaying && !isBlockedBySandbox) {
       const interval = setInterval(() => {
         setProgress((prev) => Math.min(prev + 1, 100));
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [isPlaying]);
+  }, [isPlaying, isBlockedBySandbox]);
 
   const updateProgressInHistory = (secondsWatched: number) => {
     try {
@@ -137,6 +151,30 @@ export default function Player() {
   const handleCast = () => {
     alert("Para transmitir para sua TV (Chromecast/Smart TV):\n\n1. Clique no menu do seu navegador (três pontos no canto superior direito).\n2. Selecione a opção 'Transmitir...' ou 'Cast'.\n3. Escolha sua TV na lista de dispositivos.");
   };
+
+  if (isBlockedBySandbox) {
+    return (
+      <div className="fixed inset-0 bg-zinc-950 text-white z-50 flex flex-col items-center justify-center p-4 text-center">
+        <AlertTriangle className="w-16 h-16 text-yellow-500 mb-6 animate-pulse" />
+        <h1 className="text-2xl md:text-3xl font-bold mb-4">Conteúdo Temporariamente Indisponível</h1>
+        <p className="text-zinc-400 max-w-md mb-8 text-lg">
+          Poxa, este filme/série foi removido temporariamente dos nossos servidores principais para manutenção de qualidade.
+        </p>
+        <div className="flex items-center gap-3 text-sm text-zinc-500 mb-8">
+          <RefreshCw className="w-4 h-4 animate-spin" />
+          Redirecionando você para o catálogo...
+        </div>
+        
+        <button 
+          onClick={() => window.open(window.location.href, '_blank')}
+          className="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg font-bold transition-colors flex items-center gap-2"
+        >
+          <MonitorPlay className="w-5 h-5" />
+          Tentar Forçar Reprodução (Nova Guia)
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black text-white z-50 flex flex-col">
