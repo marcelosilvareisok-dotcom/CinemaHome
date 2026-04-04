@@ -18,6 +18,7 @@ import Category from './pages/Category';
 import MyList from './pages/MyList';
 import Movies from './pages/Movies';
 import Series from './pages/Series';
+import Downloads from './pages/Downloads';
 import { getTrending } from './services/tmdb';
 import CinematicIntro from './components/CinematicIntro';
 
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/movies" element={<Movies />} />
           <Route path="/trending" element={<Category title="Bombando" fetchData={getTrending} />} />
           <Route path="/my-list" element={<MyList />} />
+          <Route path="/downloads" element={<Downloads />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/play/:type/:id" element={<Player />} />
           <Route path="/details/:type/:id" element={<Details />} />

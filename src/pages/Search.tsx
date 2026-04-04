@@ -1,7 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { searchContent } from '../services/tmdb';
-import { Play, Info, Search as SearchIcon } from 'lucide-react';
+import { Play, Info, Search as SearchIcon, Filter } from 'lucide-react';
+
+const GENRES = [
+  { id: 28, name: 'Ação' },
+  { id: 35, name: 'Comédia' },
+  { id: 27, name: 'Terror' },
+  { id: 10749, name: 'Romance' },
+  { id: 99, name: 'Documentários' },
+  { id: 878, name: 'Ficção Científica' },
+  { id: 18, name: 'Drama' },
+];
 
 export default function Search() {
   const [searchParams] = useSearchParams();
@@ -10,6 +20,11 @@ export default function Search() {
   
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  
+  // Filters
+  const [genreFilter, setGenreFilter] = useState<string>('');
+  const [yearFilter, setYearFilter] = useState<string>('');
+  const [ratingFilter, setRatingFilter] = useState<string>('');
 
   useEffect(() => {
     async function fetchResults() {
@@ -36,12 +51,55 @@ export default function Search() {
     fetchResults();
   }, [query]);
 
+  const filteredResults = useMemo(() => {
+    return results.filter(item => {
+      // Genre filter
+      if (genreFilter && !item.genre_ids?.includes(Number(genreFilter))) return false;
+      
+      // Year filter
+      const releaseDate = item.release_date || item.first_air_date;
+      if (yearFilter && releaseDate && !releaseDate.startsWith(yearFilter)) return false;
+      
+      // Rating filter
+      if (ratingFilter && item.vote_average < Number(ratingFilter)) return false;
+      
+      return true;
+    });
+  }, [results, genreFilter, yearFilter, ratingFilter]);
+
   return (
     <div className="pt-24 px-4 md:px-12 min-h-screen">
       <h1 className="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center gap-2">
         <SearchIcon className="w-6 h-6" />
         {query ? `Resultados para "${query}"` : 'Pesquisar'}
       </h1>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-4 mb-8 bg-zinc-900 p-4 rounded-lg border border-zinc-800">
+        <div className="flex items-center gap-2 text-zinc-400">
+          <Filter className="w-5 h-5" />
+          <span className="font-medium">Filtros:</span>
+        </div>
+        
+        <select value={genreFilter} onChange={e => setGenreFilter(e.target.value)} className="bg-zinc-800 text-white px-3 py-1.5 rounded text-sm">
+          <option value="">Todos os Gêneros</option>
+          {GENRES.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+        </select>
+        
+        <select value={yearFilter} onChange={e => setYearFilter(e.target.value)} className="bg-zinc-800 text-white px-3 py-1.5 rounded text-sm">
+          <option value="">Todos os Anos</option>
+          {Array.from({ length: 20 }, (_, i) => 2026 - i).map(y => <option key={y} value={y}>{y}</option>)}
+        </select>
+        
+        <select value={ratingFilter} onChange={e => setRatingFilter(e.target.value)} className="bg-zinc-800 text-white px-3 py-1.5 rounded text-sm">
+          <option value="">Qualquer Avaliação</option>
+          <option value="5">5+</option>
+          <option value="7">7+</option>
+          <option value="8">8+</option>
+        </select>
+        
+        <button onClick={() => { setGenreFilter(''); setYearFilter(''); setRatingFilter(''); }} className="text-sm text-red-500 hover:text-red-400">Limpar</button>
+      </div>
 
       {!query && (
         <div className="text-zinc-500 text-center mt-20 text-lg">
@@ -55,14 +113,14 @@ export default function Search() {
         </div>
       )}
 
-      {!loading && query && results.length === 0 && (
+      {!loading && query && filteredResults.length === 0 && (
         <div className="text-zinc-500 text-center mt-20 text-lg">
-          Nenhum resultado encontrado para "{query}".
+          Nenhum resultado encontrado para "{query}" com esses filtros.
         </div>
       )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 pb-20">
-        {results.map((item) => {
+        {filteredResults.map((item) => {
           const mediaType = item.media_type || (item.name && !item.title ? 'tv' : 'movie');
           return (
             <div 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Play, Plus, Check, ArrowLeft, Star, Calendar } from 'lucide-react';
+import { Play, Plus, Check, ArrowLeft, Star, Calendar, Download } from 'lucide-react';
 import { getMovieDetails } from '../services/tmdb';
 import AdBanner from '../components/AdBanner';
 
@@ -10,6 +10,7 @@ export default function Details() {
   const [movie, setMovie] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [inList, setInList] = useState(false);
+  const [isDownloaded, setIsDownloaded] = useState(false);
 
   useEffect(() => {
     async function fetchDetails() {
@@ -23,6 +24,13 @@ export default function Details() {
         if (savedList) {
           const list = JSON.parse(savedList);
           setInList(list.some((item: any) => item.id === response.data.id));
+        }
+
+        // Check if downloaded
+        const savedDownloads = localStorage.getItem('cinemahome_downloads');
+        if (savedDownloads) {
+          const downloads = JSON.parse(savedDownloads);
+          setIsDownloaded(downloads.some((item: any) => item.id === response.data.id));
         }
       } catch (err) {
         console.error("Erro ao buscar detalhes:", err);
@@ -49,6 +57,23 @@ export default function Details() {
     
     localStorage.setItem('cinemahome_mylist', JSON.stringify(list));
     setInList(!inList);
+  };
+
+  const toggleDownload = () => {
+    if (!movie) return;
+    
+    const savedDownloads = localStorage.getItem('cinemahome_downloads');
+    let downloads = savedDownloads ? JSON.parse(savedDownloads) : [];
+    
+    if (isDownloaded) {
+      downloads = downloads.filter((item: any) => item.id !== movie.id);
+    } else {
+      const movieToDownload = { ...movie, media_type: type };
+      downloads.push(movieToDownload);
+    }
+    
+    localStorage.setItem('cinemahome_downloads', JSON.stringify(downloads));
+    setIsDownloaded(!isDownloaded);
   };
 
   if (loading) {
@@ -147,6 +172,13 @@ export default function Details() {
               >
                 {inList ? <Check className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
                 {inList ? 'Na Minha Lista' : 'Minha Lista'}
+              </button>
+              <button 
+                onClick={toggleDownload}
+                className="flex items-center gap-2 border border-zinc-500 text-white px-6 py-3 rounded md:text-lg font-bold hover:bg-zinc-800 transition-colors"
+              >
+                {isDownloaded ? <Check className="w-6 h-6" /> : <Download className="w-6 h-6" />}
+                {isDownloaded ? 'Baixado' : 'Baixar'}
               </button>
             </div>
 
