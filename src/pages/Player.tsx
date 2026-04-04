@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Volume2, Settings2, MonitorPlay, Play, Pause, RotateCcw, RotateCw, Tv, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Volume2, Settings2, MonitorPlay, Play, Pause, RotateCcw, RotateCw, Tv, ExternalLink, Server } from 'lucide-react';
 import { getMovieDetails } from '../services/tmdb';
 import PremiumNotification from '../components/PremiumNotification';
 import { usePremium } from '../context/PremiumContext';
@@ -15,10 +15,21 @@ export default function Player() {
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const { isPremium } = usePremium();
 
-  // API do EmbedMovies.org (myembed.biz) - Não requer chave de API!
+  // Múltiplos servidores para dar opções caso um falhe ou tenha muitos anúncios
   const servers = [
     {
-      name: 'Servidor Principal (EmbedMovies)',
+      id: 'vidsrc',
+      name: 'Servidor 1 (VidSrc - Recomendado)',
+      url: `https://vidsrc.to/embed/${type}/${id}`
+    },
+    {
+      id: 'embedsu',
+      name: 'Servidor 2 (Embed.su)',
+      url: `https://embed.su/embed/${type}/${id}`
+    },
+    {
+      id: 'superflix',
+      name: 'Servidor 3 (SuperFlix)',
       url: `https://myembed.biz/${type === 'movie' ? 'filme' : 'serie'}/${id}`
     }
   ];
@@ -83,9 +94,7 @@ export default function Player() {
       const itemIndex = currentHistory.findIndex((item: any) => item.id === Number(id));
       
       if (itemIndex !== -1) {
-        // Simulate a total duration of 120 minutes (7200 seconds) for movies, 45 mins (2700s) for tv
         const totalSeconds = type === 'movie' ? 7200 : 2700;
-        // Add previously watched time if exists
         const previousProgress = currentHistory[itemIndex].progressSeconds || 0;
         const newProgress = Math.min(previousProgress + secondsWatched, totalSeconds);
         const progressPercentage = Math.round((newProgress / totalSeconds) * 100);
@@ -121,7 +130,7 @@ export default function Player() {
       const filteredHistory = currentHistory.filter((item: any) => item.id !== historyItem.id);
       
       filteredHistory.unshift(historyItem);
-      const newHistory = filteredHistory.slice(0, 5); // Keep only last 5
+      const newHistory = filteredHistory.slice(0, 5);
       
       localStorage.setItem('cinemahome_history', JSON.stringify(newHistory));
     } catch (error) {
@@ -142,27 +151,41 @@ export default function Player() {
     <div className="fixed inset-0 bg-black text-white z-50 flex flex-col">
       {/* Top Bar */}
       <div className="absolute top-0 left-0 w-full p-4 z-50 flex justify-between items-start bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
-        <div className="flex items-center gap-4 pointer-events-auto">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 pointer-events-auto">
           <button 
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-white hover:text-red-500 transition-colors bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm"
+            className="flex items-center gap-2 text-white hover:text-red-500 transition-colors bg-black/50 px-3 sm:px-4 py-2 rounded-full backdrop-blur-sm"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             <span className="font-medium hidden sm:inline">Voltar</span>
           </button>
           
+          <div className="flex items-center bg-black/50 rounded-full backdrop-blur-sm px-3 py-1.5 border border-zinc-800">
+            <Server className="w-4 h-4 text-zinc-400 mr-2" />
+            <select 
+              className="bg-transparent text-white text-sm focus:outline-none cursor-pointer"
+              value={activeServer}
+              onChange={(e) => setActiveServer(Number(e.target.value))}
+            >
+              {servers.map((server, index) => (
+                <option key={server.id} value={index} className="bg-zinc-900 text-white">
+                  {server.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <button 
             onClick={() => window.open(window.location.href, '_blank')}
-            className="flex items-center gap-2 bg-red-600/90 hover:bg-red-600 px-4 py-2 rounded-full backdrop-blur-sm transition-all border border-red-500/50 text-sm font-bold shadow-lg shadow-red-900/20"
-            title="Abrir em nova guia (Resolve erro de Sandbox)"
+            className="flex items-center gap-2 bg-red-600/90 hover:bg-red-600 px-3 sm:px-4 py-2 rounded-full backdrop-blur-sm transition-all border border-red-500/50 text-xs sm:text-sm font-bold shadow-lg shadow-red-900/20"
+            title="Abrir em nova guia"
           >
             <ExternalLink className="w-4 h-4" />
-            <span className="hidden sm:inline">Erro no vídeo? Abrir Nova Guia</span>
-            <span className="sm:hidden">Nova Guia</span>
+            <span className="hidden sm:inline">Nova Guia</span>
           </button>
         </div>
 
-        <div className="relative pointer-events-auto flex flex-col items-end gap-2">
+        <div className="relative pointer-events-auto flex flex-col items-end gap-2 hidden md:flex">
           <div className="flex gap-2">
             <button 
               onClick={handleCast}
@@ -205,6 +228,7 @@ export default function Player() {
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
+          sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-popups"
         ></iframe>
 
         {/* Simulated Controls Overlay */}
