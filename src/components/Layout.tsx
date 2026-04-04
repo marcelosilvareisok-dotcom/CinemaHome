@@ -1,6 +1,7 @@
 import { useState, ReactNode, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, Share2, X, Copy, Heart, MessageCircle, Search, PartyPopper } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -12,6 +13,9 @@ export default function Layout({ children }: LayoutProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [showPioneerBanner, setShowPioneerBanner] = useState(() => {
     return sessionStorage.getItem('hidePioneerBanner') !== 'true';
+  });
+  const [showShareTutorial, setShowShareTutorial] = useState(() => {
+    return localStorage.getItem('hasSeenShareTutorial') !== 'true';
   });
   const navigate = useNavigate();
 
@@ -27,6 +31,11 @@ export default function Layout({ children }: LayoutProps) {
   const handleCloseBanner = () => {
     setShowPioneerBanner(false);
     sessionStorage.setItem('hidePioneerBanner', 'true');
+  };
+
+  const handleCloseTutorial = () => {
+    setShowShareTutorial(false);
+    localStorage.setItem('hasSeenShareTutorial', 'true');
   };
 
   const handleShare = async () => {
@@ -112,14 +121,58 @@ export default function Layout({ children }: LayoutProps) {
             </button>
           </div>
 
-          <button 
-            onClick={() => setIsShareModalOpen(true)}
-            className="flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-red-600 to-orange-500 text-white px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold animate-pulse hover:animate-none hover:scale-105 transition-all shadow-[0_0_15px_rgba(220,38,38,0.6)] mr-1 sm:mr-2"
-            title="Compartilhar App"
-          >
-            <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span>Compartilhar</span>
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => {
+                setIsShareModalOpen(true);
+                if (showShareTutorial) handleCloseTutorial();
+              }}
+              className="flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-red-600 to-orange-500 text-white px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold animate-pulse hover:animate-none hover:scale-105 transition-all shadow-[0_0_15px_rgba(220,38,38,0.6)] mr-1 sm:mr-2 relative z-10"
+              title="Compartilhar App"
+            >
+              <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span>Compartilhar</span>
+            </button>
+
+            <AnimatePresence>
+              {showShareTutorial && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ duration: 0.4, type: "spring", bounce: 0.4 }}
+                  className="absolute top-full right-0 mt-4 w-72 sm:w-80 bg-zinc-900 border border-zinc-700/50 rounded-xl p-5 shadow-[0_0_40px_rgba(220,38,38,0.25)] z-50"
+                >
+                  {/* Seta apontando para cima */}
+                  <div className="absolute -top-2 right-12 w-4 h-4 bg-zinc-900 border-t border-l border-zinc-700/50 transform rotate-45"></div>
+                  
+                  <div className="relative z-10">
+                    <div className="flex items-start justify-between mb-3">
+                      <h4 className="font-bold text-white flex items-center gap-2 text-base">
+                        <Share2 className="w-4 h-4 text-red-500" />
+                        Espalhe a Magia!
+                      </h4>
+                      <button 
+                        onClick={handleCloseTutorial}
+                        className="text-zinc-400 hover:text-white transition-colors"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <p className="text-sm text-zinc-300 mb-5 leading-relaxed">
+                      Compartilhe o <strong>CINEMAHOME</strong> com seus amigos e familiares para que eles também possam curtir filmes e séries de graça!
+                    </p>
+                    <button 
+                      onClick={handleCloseTutorial}
+                      className="w-full bg-white/10 hover:bg-white/20 text-white font-medium py-2.5 rounded-lg transition-colors"
+                    >
+                      Entendi
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           <Link to="/admin" className="text-zinc-400 hover:text-white transition-colors flex items-center gap-1 text-sm">
             <ShieldCheck className="w-4 h-4" />
             <span className="hidden sm:inline">Admin</span>
