@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Play, Info } from 'lucide-react';
+import { Play, Info, KeyRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getNetflixOriginals, getTrending, getTopRated, getActionMovies, getComedyMovies, getHorrorMovies } from '../services/tmdb';
 import Row from '../components/Row';
@@ -16,6 +16,7 @@ interface Movie {
 export default function Home() {
   const [featured, setFeatured] = useState<Movie | null>(null);
   const navigate = useNavigate();
+  const hasTmdbKey = import.meta.env.VITE_TMDB_API_KEY && import.meta.env.VITE_TMDB_API_KEY !== 'undefined';
 
   useEffect(() => {
     async function fetchData() {
@@ -38,6 +39,16 @@ export default function Home() {
 
   return (
     <div className="bg-zinc-950 min-h-screen text-white">
+      {!hasTmdbKey && (
+        <div className="fixed top-16 left-0 w-full z-50 bg-yellow-600 text-white p-3 text-center text-sm font-medium flex items-center justify-center gap-2 shadow-lg">
+          <KeyRound className="w-4 h-4" />
+          <span>
+            <strong>API do TMDB não configurada!</strong> O catálogo está mostrando dados de teste. 
+            Adicione a variável <code className="bg-black/20 px-1 rounded">VITE_TMDB_API_KEY</code> nas configurações (Settings) do AI Studio.
+          </span>
+        </div>
+      )}
+
       {/* Hero Banner */}
       <header 
         className="h-[80vh] bg-cover bg-center relative"
